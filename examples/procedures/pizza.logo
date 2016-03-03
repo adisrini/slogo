@@ -1,0 +1,20 @@
+to slice [ ]
+[
+  rt 30
+  fd 50
+  lt 105
+  fd 25
+  bk 25
+  rt 105
+  bk 50
+]
+
+to pizza [ ]
+[
+  repeat 12
+  [
+    slice
+  ]
+]
+
+pizza

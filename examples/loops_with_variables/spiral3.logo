@@ -1,0 +1,7 @@
+repeat 200
+[
+  # note, variable set to 0 first time seen
+  set :dist + :dist 1
+  fd :dist
+  rt 89
+]

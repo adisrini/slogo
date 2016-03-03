@@ -1,0 +1,17 @@
+to random_in_range [ :min :max ]
+[
+  random sum :min sum 1 difference :max :min
+]
+
+
+to random_move [ :fdmin :fdmax :ltmin :ltmax ]
+[
+  repeat 100
+  [
+    lt random_in_range :ltmin :ltmax
+    fd random_in_range :fdmin :fdmax
+  ]
+]
+
+
+random_move 5 15 -10 5

@@ -1,2 +1,2 @@
 # slogo
-A simple LOGO integrated development environment.
+A development environment that helps users write SLogo programs.

@@ -1,0 +1,16 @@
+to regularShape [ :distance :angle ]
+[
+  repeat quotient 360 :angle
+  [
+    fd :distance
+    rt :angle
+  ]
+]
+
+cs
+regularShape 100 120
+regularShape 100 90
+regularShape 100 72
+regularShape 100 60
+
+

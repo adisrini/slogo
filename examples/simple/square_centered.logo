@@ -1,0 +1,20 @@
+# move to side of square
+pu
+fd 50
+rt 90
+
+# draw square
+pd
+fd 50
+rt 90
+fd 100
+rt 90
+fd 100
+rt 90
+fd 100
+rt 90
+fd 50
+
+# move back to center
+pu
+home

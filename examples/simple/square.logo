@@ -1,0 +1,9 @@
+# draw a square
+fd 100
+rt 90
+fd 100
+rt 90
+fd 100
+rt 90
+fd 100
+rt 90

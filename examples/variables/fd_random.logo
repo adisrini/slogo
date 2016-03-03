@@ -1,0 +1,2 @@
+make :random sum 1 random 100
+fd :random

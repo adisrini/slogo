@@ -1,0 +1,22 @@
+make :distance 100
+
+# move to side of square
+pu
+fd quotient :distance 2
+rt 90
+
+# draw square
+pd
+fd / :distance 2
+rt 90
+fd :distance
+rt 90
+fd :distance
+rt 90
+fd :distance
+rt 90
+fd / :distance 2
+
+# move back to center
+pu
+home

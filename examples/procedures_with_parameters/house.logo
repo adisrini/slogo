@@ -1,0 +1,29 @@
+to poly [ :numsides :length ]
+[
+  repeat :numsides
+  [
+    fd :length 
+    rt quotient 360 :numsides
+  ]
+]
+
+to square [ :side ]
+[
+  poly 4 :side
+]
+
+to triangle [ :side ]
+[
+  poly 3 :side
+]
+
+
+to house [ :size ]
+[
+  square :size
+  fd :size rt 30
+  triangle :size
+]
+
+
+house 100

@@ -1,0 +1,10 @@
+make :distance 50
+
+fd :distance
+rt 90
+fd :distance
+rt 90
+fd :distance
+rt 90
+fd :distance
+rt 90

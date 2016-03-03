@@ -1,0 +1,48 @@
+package slogo.view;
+
+<<<<<<< HEAD
+public class Console implements IConsole {
+
+	@Override
+	public void printText(StringBuilder text) {
+		// TODO Auto-generated method stub
+		
+	}
+=======
+import javafx.scene.control.ScrollPane;
+import javafx.scene.text.Text;
+
+public class Console extends ScrollPane implements IConsole{
+
+    private Text textToDisplay;
+    
+    public Console (double paneWidth, double paneHeight){
+        
+        // set dimensions for window
+        this.setWidth(paneWidth);
+        this.setHeight(paneHeight);
+        
+        // set policy for scrolling
+        this.setHbarPolicy(ScrollBarPolicy.NEVER);
+        this.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+        
+        // Does not allow for horizontal scrolling
+        this.setFitToWidth(true);
+        
+        // Initialize textToDisplay
+        textToDisplay= new Text();
+        
+        this.setContent(textToDisplay);
+    }
+    
+    /**
+     * Updates the textToDisplay to include the new text passed in
+     * @param text: text passed to display on the console
+     */
+    @Override
+    public void printText (StringBuilder text) {
+        textToDisplay.setText(textToDisplay.getText()+text+"/n");
+    }
+>>>>>>> arjun
+
+}

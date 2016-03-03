@@ -1,0 +1,12 @@
+set :count 12
+
+to dash [ ]
+[
+  repeat :count 
+  [
+    pu fd 10 pd fd 10
+  ]
+]
+
+
+dash

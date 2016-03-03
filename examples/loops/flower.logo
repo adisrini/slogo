@@ -1,0 +1,13 @@
+repeat 6
+[
+  repeat 2
+  [
+    repeat 30
+    [
+      fd 6
+      rt 2
+    ]
+    rt 120
+  ]
+  rt 60
+]

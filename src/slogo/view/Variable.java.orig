@@ -1,0 +1,34 @@
+package slogo.view;
+
+<<<<<<< HEAD
+public class Variable implements IVariable {
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setVal(double value) {
+		// TODO Auto-generated method stub
+		
+	}
+=======
+public class Variable implements IVariable{
+    
+    private String name;
+    private double value;
+    
+    @Override
+    public String getName () {
+        return name;
+    }
+
+    @Override
+    public void setVal (double value) {
+        this.value= value;
+    }
+>>>>>>> arjun
+
+}

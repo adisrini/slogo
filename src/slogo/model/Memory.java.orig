@@ -1,0 +1,82 @@
+package slogo.model;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Memory implements IMemory {
+    private static Memory memoryInstance = null;
+    //TODO: Change so that the methods are package friendly instead
+
+	private DoublyLinkedList<IExecution> myExecutions;
+	private Map<String,Double> myVariables;
+	private Map<String,String> myMethods;
+	
+	private Memory(){
+	    myExecutions= new DoublyLinkedList<IExecution>();
+	    myVariables = new HashMap<String,Double>();
+	    myMethods = new HashMap<String,String>();
+	}
+	
+	public static Memory getMemoryInstance(){
+	    if (memoryInstance == null){
+	        memoryInstance = new Memory();
+	    }
+	    return memoryInstance;
+	}
+	
+	@Override
+	public void writeExecution(IExecution exec) {
+		myExecutions.add(exec);
+	}
+
+	@Override
+	public IExecution readCurrExecution() {
+		return myExecutions.getCurr();
+	}
+
+	@Override
+	public IExecution readNextExecution() {
+		return myExecutions.getNext();
+	}
+
+	@Override
+	public IExecution readPrevExecution() {
+		return myExecutions.getPrev();
+	}
+
+	@Override
+	public void writeVariable(String varName, double varValue) {
+		myVariables.put(varName, varValue);
+	}
+
+	@Override
+	public double readVariable(String varName) {
+		return myVariables.get(varName);
+	}
+
+	@Override
+	public void writeMethod(String methodName, String methodContent) {
+		myMethods.put(methodName,methodContent);
+	}
+
+	@Override
+	public String readMethod(String methodName) {
+		return myMethods.get(methodName);
+	}
+	
+<<<<<<< HEAD
+	@Override
+	public boolean hasNextExecution() {
+		return myExecutions.hasNext();
+	}
+
+	@Override
+	public boolean hasPrevExecution() {
+		return myExecutions.hasPrev();
+=======
+	public Map<String,Double> getVariableMap(){
+	    return Collections.unmodifiableMap(myVariables);
+>>>>>>> arjun
+	}
+}

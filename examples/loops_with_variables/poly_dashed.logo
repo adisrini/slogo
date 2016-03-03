@@ -1,0 +1,13 @@
+make :distance 100
+make :angle 90
+
+dotimes [ :k quotient 360 :angle ]
+[
+  fd :distance
+  rt :angle
+  ifelse equal? quotient :k 2 0 [
+    pu
+  ] [
+    pd
+  ]
+]

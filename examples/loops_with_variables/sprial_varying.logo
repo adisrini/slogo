@@ -1,0 +1,5 @@
+for [ :dist 1 110 1 ] 
+[
+  fd :dist
+  rt product :dist 3
+]

@@ -1,0 +1,15 @@
+home
+
+repeat 30 
+[
+  repeat 20 
+  [
+    fd 10
+    rt 10
+  ]
+  repeat 10
+  [
+    fd 20
+    rt 100
+  ]
+]

@@ -1,0 +1,13 @@
+# same as fd 100
+fd fd 50
+
+# same as rt 100 fd 100
+fd rt 100
+
+# same as fd 100
+fd * greater? 5 3 100
+
+# same as fd 10 fd 20 fd 30 fd 40 rt 40
+rt for [ :dist 10 40 10 ] [ 
+  fd :dist
+]

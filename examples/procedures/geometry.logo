@@ -1,0 +1,24 @@
+to triangle [ ]
+[ 
+  repeat 3 [
+    fd 50 
+    rt 120
+  ]
+]
+
+to circle [ ]
+[
+  repeat 360 [
+    fd 1 
+    rt 1
+  ]
+]
+
+to square [ ]
+[
+  repeat 4 [
+    fd 100
+    rt 90
+  ]
+  fd 100
+]

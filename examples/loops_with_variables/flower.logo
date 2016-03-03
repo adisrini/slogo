@@ -1,0 +1,7 @@
+repeat 11 [
+   dotimes [ :t 360 ] 
+   [
+      fd 1
+      rt / sin :t 2
+   ]
+]

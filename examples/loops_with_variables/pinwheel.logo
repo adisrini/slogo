@@ -1,0 +1,11 @@
+set :distance 10
+
+repeat 18
+[
+  forward * 5 :distance
+  right 150
+  forward * 6 :distance      
+  right 100
+  forward * 3 :distance
+  right 90
+]

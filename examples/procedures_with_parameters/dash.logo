@@ -1,0 +1,15 @@
+to dash [ :count :size ]
+[
+  repeat :count
+  [
+    pu fd :size pd fd :size
+  ]
+]
+
+dash 20 8
+rt 60
+dash 8 20
+rt 60
+dash 10 10
+
+
