@@ -1,0 +1,359 @@
+package slogo.view;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Stack;
+import generic.Pair;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
+import slogo.model.IDisplayState;
+import slogo.model.IState;
+import slogo.model.ITurtleState;
+
+
+public class GraphicsWindow extends StackPane implements IGraphicsWindow, Displayable, Updatable {
+
+    private Canvas myCanvas;
+    private GraphicsContext myGC;
+
+    private int penColorIndex = 1;
+    private SimpleIntegerProperty backgroundColorIndex;
+
+    Map<Integer, Stack<Pair<ITurtleState, Node>>> nodes;
+    private List<Node> stamps;
+    
+    Map<Integer, TurtleView> turtleMap;
+
+    private InternalEditor internalEditor;
+
+    private ResourceBundle palette;
+
+    public GraphicsWindow (double paneWidth, double paneHeight, int numTurtles) {
+        this.setWidth(paneWidth);
+        this.setHeight(paneHeight);
+
+        palette = ResourceBundle.getBundle("resources/general/Palette");
+        
+        initializeBackgroundColorIndex();
+
+        nodes = new HashMap<Integer, Stack<Pair<ITurtleState, Node>>>();
+        stamps = new ArrayList<Node>();
+        turtleMap = new HashMap<Integer, TurtleView>();
+
+        initializeCanvas(paneWidth, paneHeight);
+
+        // TODO: LOAD FROM XML FILE
+        setBackgroundColor(Color.WHITE);
+        internalEditor = InternalEditor.getInstance();
+
+        initialTurtleFactory(numTurtles);
+    }
+
+    private void initializeBackgroundColorIndex () {
+        backgroundColorIndex = new SimpleIntegerProperty();
+        final ChangeListener changeListener = new ChangeListener() {
+
+            @Override
+            public void changed (ObservableValue observable, Object oldValue, Object newValue) {
+                Integer value = (Integer) newValue;
+                System.out.println("pen index: " + value);
+                if (value == 0) {
+                    setBackgroundColor(Color.valueOf(palette.getString("2")));
+                }
+                else {
+                    setBackgroundColor(Color.valueOf(palette.getString(Integer.toString((value)))));
+                }
+            }
+        };
+    }
+
+    private Line positionedLine (double startx,
+                                 double starty,
+                                 double endx,
+                                 double endy,
+                                 Color penColor) {
+
+        Line line = new Line(startx, starty, endx, endy);
+        line.setTranslateX(endx - (endx - startx) / 2);
+        line.setTranslateY(endy - (endy - starty) / 2);
+
+        line.setStroke((Paint) penColor);
+        line.setStrokeWidth(3);
+        return line;
+    }
+
+    /**
+     * Initializes the canvas and sets a default background color of
+     * white, then adds to the parent StackPane
+     * 
+     * @param paneWidth
+     * @param paneHeight
+     */
+    private void initializeCanvas (double paneWidth, double paneHeight) {
+        myCanvas = new Canvas(paneWidth, paneHeight);
+        myGC = myCanvas.getGraphicsContext2D();
+
+        myGC.setFill(Color.BLACK);
+        myGC.fillRect(0, 0, paneWidth, paneHeight);
+
+        // add the canvas to the root
+        this.getChildren().add(myCanvas);
+    }
+
+    /**
+     * Changes the background color of the window in which the turtle
+     * moves.
+     */
+    @Override
+    public void setBackgroundColor (Color color) {
+        myGC.setFill(color);
+        myGC.fillRect(0, 0, myCanvas.getWidth(), myCanvas.getHeight());
+    }
+
+    /**
+     * TODO: UPDATE THIS METHOD TO CORRESPOND WITH ONE IN TURTLEVIEW
+     * 
+     * Changes the image of the turtle to another image as given by a
+     * string to indicate the image name.
+     */
+    @Override
+    public void setTurtleImage (String turtleImage) {
+
+    }
+
+    @Override
+    public void display (Object object) {
+        this.getChildren().add((Node) object);
+    }
+
+    private void updateTurtle (ITurtleState state) {
+        if (!turtleMap.containsKey(state.getId())) {
+            turtleMap.put(state.getId(), initializeTurtle(state.getId()));
+        }
+
+        TurtleView turtle = turtleMap.get(state.getId());
+
+        if (state.getHeading() > 360) {
+            System.out.println("RESET TURTLE");
+            undo(state);
+            turtle.reset();
+            return;
+        }
+
+        double startX = turtle.getTranslateX();
+        double startY = turtle.getTranslateY();
+
+        turtle.update(state);
+
+        double endX = state.getX();
+        double endY = state.getY();
+
+        Node line = null;
+
+        if (turtle.isPenDown()) {
+            line = positionedLine(startX, startY, endX, endY, turtle.getPenColor());
+        }
+
+        // add to stack
+        addNode(state, line);
+        
+        this.getChildren().add(line);
+        
+        if (state.hasStamp()){
+            ImageView stamp = turtle.stamp();
+            addNode(state,stamp);
+            //myGC.drawImage(stamp.getImage(), stamp.getY(), stamp.getX());
+            this.getChildren().add(stamp);
+            stamps.add(stamp);
+        }
+
+    }
+    
+    private void clearStamps(){
+        for (Node node : stamps){
+            this.getChildren().remove(node);
+        }
+        stamps.clear();
+    }
+
+    private void updateDisplay (IDisplayState state) {
+        System.out.println("updating Display state");
+        backgroundColorIndex.setValue(state.getBackgroundIndex());
+        if (state.getClearStamps()){
+            clearStamps();
+        }
+    }
+
+    /**
+     * Takes in a State object and transforms the position and rotation
+     * of the turtle accordingly.
+     */
+    @Override
+    public void update (Object object) {
+
+        IState state = null;
+
+        if (object instanceof ITurtleState) {
+            updateTurtle((ITurtleState) object);
+        }
+        else if (object instanceof IDisplayState) {
+            updateDisplay((IDisplayState) object);
+        }
+
+    }
+
+    private void reset (int id) {
+        Stack<Pair<ITurtleState, Node>> nodeStack = nodes.get(id);
+
+        while (!nodeStack.isEmpty()) {
+
+            removeNode(nodeStack);
+        }
+
+        // turtleMap.get(state.getId()).update(state);
+    }
+
+    void undo (ITurtleState state) {
+        // Note this is a shallow copy
+        Stack<Pair<ITurtleState, Node>> nodeStack = nodes.get(state.getId());
+
+        while (!nodeStack.isEmpty() && nodeStack.peek().getFirst() != state) {
+
+            removeNode(nodeStack);
+        }
+
+        turtleMap.get(state.getId()).update(state);
+
+    }
+
+    /**
+     * Move turtle to original position
+     * Remove all lines drawn
+     */
+    void reset () {
+        for (Integer key : nodes.keySet()) {
+            Stack<Pair<ITurtleState, Node>> nodeStack = nodes.get(key);
+
+            while (!nodeStack.isEmpty()) {
+                removeNode(nodeStack);
+            }
+
+        }
+    }
+
+    private void removeNode (Stack<Pair<ITurtleState, Node>> nodeStack) {
+        Pair<ITurtleState, Node> pair = nodeStack.pop();
+        TurtleView turtle = turtleMap.get(pair.getFirst().getId());
+        turtle.update(pair.getFirst());
+        this.getChildren().remove(pair.getLast());
+    }
+
+    private void addNode (ITurtleState state, Node nodeToAdd) {
+        if (!nodes.containsKey(state.getId())) {
+            nodes.put(state.getId(), new Stack<Pair<ITurtleState, Node>>());
+        }
+
+        Stack<Pair<ITurtleState, Node>> nodeStack = nodes.get(state.getId());
+
+        nodeStack.push(new Pair<ITurtleState, Node>(state, nodeToAdd));
+
+        // Not needed because of shallow copy but for safety
+        nodes.put(state.getId(), nodeStack);
+
+    }
+
+    void initialTurtleFactory (int numTurtles) {
+        StringBuilder initializedTurtles = new StringBuilder();
+        initializedTurtles.append("TELL [ ");
+
+        for (int id = 1; id <= numTurtles; id++) {
+            turtleMap.put(id, initializeTurtle(id));
+            initializedTurtles.append(id + " ");
+        }
+        initializedTurtles.append("]");
+
+        System.out.println("TurtleMap keyset- graphicsWindow: " + turtleMap.keySet());
+
+        internalEditor.setEditorText(initializedTurtles);
+    }
+
+    /**
+     * Initializes the Turtle class based on a passed id
+     * StackPane.
+     */
+    private TurtleView initializeTurtle (int id) {
+        TurtleView turtle = new TurtleView(id);
+
+        turtle.setFitWidth(100);
+        turtle.setFitHeight(100);
+        StackPane.setAlignment(turtle, Pos.CENTER);
+
+        display(turtle);
+
+        return turtle;
+    }
+
+    Canvas getCanvas () {
+        return myCanvas;
+    }
+
+    /**
+     * Sets speed for all turtles
+     * 
+     * @param speed
+     */
+    void setSpeed (double speed) {
+        for (Integer key : turtleMap.keySet()) {
+            turtleMap.get(key).setSpeed(speed);
+        }
+    }
+
+    /**
+     * Sets pen color for all turtles
+     * 
+     */
+    @Override
+    public void setPenColor (Color color) {
+        for (Integer key : turtleMap.keySet()) {
+            turtleMap.get(key).setPenColor(color);
+        }
+    }
+
+    double getFrameRate (ITurtleState state) {
+        return turtleMap.get(state.getId()).getFrameRate(state);
+    }
+
+    Map<Integer, TurtleView> getTurtles () {
+        return Collections.unmodifiableMap(turtleMap);
+    }
+
+    TurtleView getTurtle (int id) {
+        return turtleMap.get(id);
+    }
+    
+    int getNumTurtles(){
+        return turtleMap.keySet().size();
+    }
+    
+    int getBackgroundColorIndex(){
+        return this.backgroundColorIndex.getValue();
+    }
+    
+    void setBackgroundColorIndex(int index){
+        backgroundColorIndex.setValue(index);
+    }
+}

@@ -3,31 +3,43 @@ package slogo.view;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 
-
+/**
+ * The editor view component. This is where the user
+ * can type their code that will be run.
+ *
+ * @author Aditya Srinivasan, Arjun Desai
+ */
 public class Editor extends ScrollPane implements IEditor {
     
     private TextArea userInput;
     
+    private static final String PROMPT = "Enter your SLogo code here!";
+    
+    /**
+     * Initializes the editor with a specified width and height,
+     * and an initial prompt text.
+     * @param paneWidth
+     * @param paneHeight
+     */
     public Editor(double paneWidth, double paneHeight){
         
-        // set dimensions for window
         this.setWidth(paneWidth);
         this.setHeight(paneHeight);
         
-        // set policy for scrolling
         this.setHbarPolicy(ScrollBarPolicy.NEVER);
         this.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
         
-        // Does not allow for horizontal scrolling
         this.setFitToWidth(true);
         
-        // Initialize userInput
-        
         userInput= new TextArea();
-        userInput.setPromptText("Enter your SLogo code here!");
+        userInput.setPromptText(PROMPT);
         this.setContent(userInput);
     }
     
+    /**
+     * Returns the text from the editor to whoever
+     * wants it.
+     */
     @Override
     public StringBuilder getEditorText () {
         StringBuilder userCommand = new StringBuilder(userInput.getText());
@@ -35,8 +47,11 @@ public class Editor extends ScrollPane implements IEditor {
         return userCommand;
     }
 
+    /**
+     * Sets the editor text to a specified String
+     * @param code
+     */
 	public void setEditorText(String code) {
-		// TODO Auto-generated method stub
 		userInput.setText(code);
 	}
 

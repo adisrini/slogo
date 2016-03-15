@@ -1,12 +1,15 @@
 package slogo.model;
 
-abstract class VISIBILITYCHANGE extends STATECREATOR {
+abstract class VisibilityChange extends TurtleStateCreator {
 	protected boolean myStatus;
+	
 	@Override
-	public double executeFunction(IMemory m) {
-		super.executeFunction(m);
+	protected double setState(TurtleState myState) {
 		myState.setVisibility(myStatus);
-		m.readCurrExecution().addState(myState);
 		return myStatus ? 1 : 0;
+	}
+	@Override
+	protected int argsNeeded() {
+		return 0;
 	}
 }

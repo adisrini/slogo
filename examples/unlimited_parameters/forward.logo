@@ -1,0 +1,5 @@
+# go forward 70 (or throw an error)
+fd ( sum 10 10 10 20 20 )
+
+# go forward 70 (or throw an error)
+( fd 10 10 10 20 20 )

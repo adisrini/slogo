@@ -1,57 +1,36 @@
 package slogo.model;
 
-import java.util.Iterator;
 import java.util.List;
 
 interface IExecution {
-	/**
-	 * Returns whatever State the current pointer
-	 * is pointing to
-     * @return State
+
+    public List<IState> getCurrStateList();
+
+    public List<IState> undoStateList ();
+
+    public List<IState> redoStateList ();
+
+    List<IState> getNextStateList();
+
+    /**
+     * Sets head to previous State Node
+     * 
+     * @return the state at that Node
      */
-	IState getCurrState();
-	/**
-     * Returns a State in the Future
-     * @return next State
+    public List<IState> getPrevStateList();
+
+    /**
+     * Add state to the end of the list
      */
-	IState getNextState();
-	/**
-     * Goes back one State
-     * @return past State
+    public void addStateList (List<IState> list);
+    
+    public boolean hasNextState ();
+
+    public boolean hasCurrState ();
+
+    public boolean hasPrevState ();
+    /**
+     * Returns list of all states
      */
-	IState getPrevState();
-	/**
-     * Adds a specified State to the linked list
-     * of States
-     */
-	void addState(IState s);
-	/**
-     * goes through and parses the String input,
-     * creating all the Functions needed
-     */
-	void createFunctions(String input);
-	/**
-     * Executes all functions created in the list above
-     * this generates a list of States 
-     */
-	void executeFunctions();
-	/**
-     * returns true if the state list 
-     * has another state
-     */
-	boolean hasNextState();
-	/**
-     * returns true if the state list
-     * has a previous state
-     */
-	
-	boolean hasCurrState();
-	boolean hasPrevState();
-	public IState undoState();
-	public IState redoState();
-	/**
-     * Returns list of States
-     * @return List of States
-     */
-	List<IState> getListOfStates();
+    public List<List<IState>> getListOfStates ();
 }

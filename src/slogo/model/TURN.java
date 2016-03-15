@@ -1,17 +1,21 @@
 package slogo.model;
 
-public abstract class TURN extends STATECREATOR{
-	protected double myRotationNum;
-	@Override
-	public abstract void createFunction(IParser p, IMemory m);
-	@Override
-	public double executeFunction(IMemory m) {
-		super.executeFunction(m);
-		double newHeading = myRotationNum + myState.getHeading();
+public abstract class Turn extends TurtleStateCreator{
+	private static final int LIMIT = 1;
+
+	public double setState(TurtleState myState){
+		double newHeading = setVal(getVal(0)) + myState.getHeading();
 		int div = (int)(newHeading/360);
 		newHeading = newHeading -360*(div);
 		myState.setHeading(newHeading);
-		m.readCurrExecution().addState(myState);
-		return myRotationNum;
+		return getVal(0);
 	}
+	
+	protected abstract double setVal(double val);
+	
+	@Override
+	protected int argsNeeded() {
+		return LIMIT;
+	}
+	
 }

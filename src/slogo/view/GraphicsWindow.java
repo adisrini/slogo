@@ -1,77 +1,156 @@
 package slogo.view;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Stack;
 import generic.Pair;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
-import slogo.model.IState;
+import slogo.model.IDisplayState;
+import slogo.model.ITurtleState;
 
-
+/**
+ * The graphics window view component.
+ * This is the bulk of the front-end, as it displays what
+ * the turtle is instructed to do.
+ * 
+ * @author Aditya Srinivasan, Arjun Desai
+ *
+ */
 public class GraphicsWindow extends StackPane implements IGraphicsWindow, Displayable, Updatable {
 
     private Canvas myCanvas;
     private GraphicsContext myGC;
-    private Turtle myTurtle;
+    private SimpleIntegerProperty backgroundColorIndex;
+    private Map<Integer, Stack<Pair<ITurtleState, Node>>> nodes;
+    private List<Node> stamps;
+    private Map<Integer, TurtleView> turtleMap;
+    private InternalEditor internalEditor;
+    private ResourceBundle palette;
+    private static final String PALETTE_PROPERTIES = "resources/general/Palette";
+    private static final String PEN_STYLE_PROPERTIES = "resources/general/PenStyle";
+    private static final Color DEFAULT_BG_COLOR = Color.WHITE;
+    private static final String DEFAULT_STYLE = "SOLID";
 
-    private Color lineColor;
-
-    Stack<Pair<IState,Node>> nodes;
-
-    public GraphicsWindow (double paneWidth, double paneHeight) {
-        // set dimensions for window
+    /**
+     * Instantiates the graphics window with a given width and height, and
+     * the number of turtles to place.
+     * 
+     * @param paneWidth
+     * @param paneHeight
+     * @param numTurtles
+     */
+    public GraphicsWindow (double paneWidth, double paneHeight, int numTurtles) {
         this.setWidth(paneWidth);
         this.setHeight(paneHeight);
 
-        nodes = new Stack<Pair<IState,Node>> ();
+        palette = ResourceBundle.getBundle(PALETTE_PROPERTIES);
+        
+        initializeBackgroundColorIndex();
+
+        nodes = new HashMap<Integer, Stack<Pair<ITurtleState, Node>>>();
+        stamps = new ArrayList<Node>();
+        turtleMap = new HashMap<Integer, TurtleView>();
 
         initializeCanvas(paneWidth, paneHeight);
 
-        initializeTurtle();
+        setBackgroundColor(DEFAULT_BG_COLOR);
+        internalEditor = InternalEditor.getInstance();
 
-        setBackgroundColor(Color.WHITE);
-
-        lineColor = Color.BLACK;
-
-        /*
-         * Line line1 = new Line(0, 0, 0, -100);
-         * line1.setTranslateX(0);
-         * line1.setTranslateY(-50);
-         * Line line2 = new Line(0, -100, -100, -100);
-         * line2.setTranslateX(-50);
-         * line2.setTranslateY(-100);
-         * this.getChildren().addAll(line1, line2);
-         */
-
+        initialTurtleFactory(numTurtles);
     }
 
-    private Line positionedLine (double startx, double starty, double endx, double endy) {
+    /**
+     * Initializes the background color index.
+     */
+    @SuppressWarnings({ "rawtypes", "unused" })
+	private void initializeBackgroundColorIndex () {
+        backgroundColorIndex = new SimpleIntegerProperty();
+        final ChangeListener changeListener = new ChangeListener() {
+
+            @Override
+            public void changed (ObservableValue observable, Object oldValue, Object newValue) {
+                Integer value = (Integer) newValue;
+                if (value == 0) {
+                    setBackgroundColor(DEFAULT_BG_COLOR);
+                }
+                else {
+                    setBackgroundColor(Color.valueOf(palette.getString(Integer.toString((value)))));
+                }
+            }
+        };
+    }
+
+    /**
+     * Positions and styles the pen according to the information
+     * from the turtle.
+     * 
+     * @param startx - starting X position
+     * @param starty - starting Y position
+     * @param endx - ending X position
+     * @param endy - ending Y position
+     * @param penColor - color of the stroke
+     * @param penWidth - width of the stroke
+     * @param penStyleIndex - style index from properties file
+     * @return the positioned and styled line
+     */
+    private Line positionedLine (double startx,
+                                 double starty,
+                                 double endx,
+                                 double endy,
+                                 Color penColor,
+                                 String penWidth,
+                                 int penStyleIndex) {
 
         Line line = new Line(startx, starty, endx, endy);
         line.setTranslateX(endx - (endx - startx) / 2);
         line.setTranslateY(endy - (endy - starty) / 2);
-
-        line.setStroke((Paint) lineColor);
-        line.setStrokeWidth(3);
+        line.setStroke(penColor);
+        line.setStrokeWidth(Double.parseDouble(penWidth));
+        line.getStrokeDashArray().clear();
+        
+        for(Double d : assignDashArray(penStyleIndex)) {
+        	line.getStrokeDashArray().add(d);
+        }
+        
         return line;
     }
-
+    
     /**
-     * Initializes the Turtle class and adds it to the
-     * StackPane.
+     * Returns the dash array corresponding to the pen style
+     * index specified.
+     * @param penStyleIndex
+     * @return
      */
-    private void initializeTurtle () {
-        myTurtle = new Turtle();
-        myTurtle.setFitWidth(100);
-        myTurtle.setFitHeight(100);
-        StackPane.setAlignment(myTurtle, Pos.CENTER);
-        display(myTurtle);
+    private List<Double> assignDashArray(int penStyleIndex) {
+    	ResourceBundle styles = ResourceBundle.getBundle(PEN_STYLE_PROPERTIES);
+        String styleName = "";
+        
+        for(String key : styles.keySet()) {
+        	if(key.equals(Integer.toString(penStyleIndex))) {
+        		styleName = styles.getString(key);
+        	}
+        }
+        
+        if(styleName.equals("")) {
+        	styleName = DEFAULT_STYLE;
+        }
+        
+        LineStyle lineStyle = LineStyle.valueOf(styleName);
+        
+        return lineStyle.getDashArray();
     }
 
     /**
@@ -88,17 +167,7 @@ public class GraphicsWindow extends StackPane implements IGraphicsWindow, Displa
         myGC.setFill(Color.BLACK);
         myGC.fillRect(0, 0, paneWidth, paneHeight);
 
-        // add the canvas to the root
         this.getChildren().add(myCanvas);
-    }
-
-    /**
-     * Changes the color of the pen that the turtle draws in.
-     */
-    @Override
-    public void setPenColor (Color color) {
-        // TODO Auto-generated method stub
-        lineColor = color;
     }
 
     /**
@@ -107,7 +176,6 @@ public class GraphicsWindow extends StackPane implements IGraphicsWindow, Displa
      */
     @Override
     public void setBackgroundColor (Color color) {
-        // TODO Auto-generated method stub
         myGC.setFill(color);
         myGC.fillRect(0, 0, myCanvas.getWidth(), myCanvas.getHeight());
     }
@@ -118,25 +186,75 @@ public class GraphicsWindow extends StackPane implements IGraphicsWindow, Displa
      */
     @Override
     public void setTurtleImage (String turtleImage) {
-        // TODO Auto-generated method stub
-        Image newImage =
-                new Image(this.getClass().getResourceAsStream("/resources/images/" + turtleImage));
-        myTurtle.setImage(newImage);
+
     }
 
+    /**
+     * Displays the Object given to the graphics window
+     */
     @Override
     public void display (Object object) {
-        // TODO Auto-generated method stub
         this.getChildren().add((Node) object);
     }
 
-    private boolean sameQuantities (double a, double b) {
-        System.out.println("A: " + a + " B: " + b);
-        if (Math.abs(a - b) < Math.pow(10, -10)) {
-            return true;
+    /**
+     * Updates the turtle's positions and adds a line/stamp to
+     * the window if needed.
+     * @param state
+     */
+    private void updateTurtle (ITurtleState state) {
+    	initializeTurtle(state);
+        TurtleView turtle = turtleMap.get(state.getId());
+
+        if (state.getHeading() > 360) {
+            undo(state); turtle.reset(); return;
         }
 
-        return false;
+        double startX = turtle.getTranslateX(); double startY = turtle.getTranslateY();
+        double endX = state.getX(); double endY = state.getY();
+
+        turtle.update(state);
+        Node line = null;
+        if(turtle.isPenDown()) {
+            line = positionedLine(startX, startY, endX, endY, turtle.getPenColor(), turtle.getPenWidth(), turtle.getPenStyleIndex());
+        }
+
+        addNode(state, line);
+        if (state.hasStamp()){
+            addNode(state, turtle.stamp());
+            stamps.add(turtle.stamp());
+        }
+    }
+    
+    /**
+     * Initializes the turtle if it is not already initialized.
+     * @param state
+     */
+    private void initializeTurtle(ITurtleState state) {
+    	if (!turtleMap.containsKey(state.getId())) {
+            turtleMap.put(state.getId(), initializeTurtle(state.getId()));
+        }
+    }
+    
+    /**
+     * Clears all stamps from the graphics window.
+     */
+    private void clearStamps(){
+        for(Node node : stamps){
+            this.getChildren().remove(node);
+        }
+        stamps.clear();
+    }
+
+    /**
+     * Updates the display if the state is a DisplayState
+     * @param state
+     */
+    private void updateDisplay (IDisplayState state) {
+        backgroundColorIndex.setValue(state.getBackgroundIndex());
+        if (state.getClearStamps()){
+            clearStamps();
+        }
     }
 
     /**
@@ -146,123 +264,29 @@ public class GraphicsWindow extends StackPane implements IGraphicsWindow, Displa
     @Override
     public void update (Object object) {
 
-        IState state = (IState) object;
-
-        System.out.println(state);
-        System.out.println(myTurtle);
-
-        if (state.getHeading() > 360 || state.getHeading()<0) {
-            System.out.println("RESET");
-            reset();
-            return;
+        if (object instanceof ITurtleState) {
+            updateTurtle((ITurtleState) object);
+        }
+        else if (object instanceof IDisplayState) {
+            updateDisplay((IDisplayState) object);
         }
 
-        if (sameQuantities(state.getX(), myTurtle.getTranslateX()) &&
-            sameQuantities(state.getY(), myTurtle.getTranslateY()) &&
-            sameQuantities(state.getHeading(), myTurtle.getRotate())) {
-            System.out.println("SAME");
-            return;
+    }
+
+    /**
+     * Undoes the last state and reverts to the previous one
+     * @param state
+     */
+    void undo (ITurtleState state) {
+        Stack<Pair<ITurtleState, Node>> nodeStack = nodes.get(state.getId());
+
+        while (!nodeStack.isEmpty() && nodeStack.peek().getFirst() != state) {
+
+            removeNode(nodeStack);
         }
 
-        double startX = myTurtle.getTranslateX();
-        double startY = myTurtle.getTranslateY();
+        turtleMap.get(state.getId()).update(state);
 
-        updateTurtle(state);
-
-        double endX = state.getX();
-        double endY = state.getY();
-        
-        Node line = positionedLine(startX,startY,endX,endY);
-        nodes.add(new Pair(state,line));
-        
-        this.getChildren().add(line);
-    }
-
-
-    Canvas getCanvas () {
-        return myCanvas;
-    }
-
-    public void updateTurtle (IState state) {
-
-        /*
-         * double distance = distance(new Pair<Double, Double>(myTurtle.getTranslateX(),
-         * myTurtle.getTranslateY()),
-         * new Pair<Double, Double>(state.getX(), state.getY()));
-         * double duration = distance*myTurtle.getSpeed();
-         * 
-         * TranslateTransition tt = new TranslateTransition(Duration.millis(duration), myTurtle);
-         * 
-         * double currentX = myTurtle.getTranslateX();
-         * double currentY = myTurtle.getTranslateY();
-         * 
-         * tt.setByX(currentX);
-         * tt.setByY(currentY);
-         * tt.setToX(state.getX());
-         * tt.setToY(state.getY());
-         * 
-         * RotateTransition rt = new RotateTransition(Duration.millis(duration), myTurtle);
-         * 
-         * double currentHeading = myTurtle.getRotate();
-         * 
-         * rt.setByAngle(currentHeading);
-         * rt.setToAngle(state.getHeading());
-         * 
-         * ParallelTransition pt = new ParallelTransition();
-         * pt.getChildren().addAll(tt, rt);
-         * 
-         * pt.play();
-         */
-
-        myTurtle.setTranslateX(state.getX());
-        myTurtle.setTranslateY(state.getY());
-        myTurtle.setRotate(state.getHeading());
-    }
-
-    public double getFrameRate (IState state) {
-        double distance =
-                distance(new Pair<Double, Double>(myTurtle.getTranslateX(),
-                                                  myTurtle.getTranslateY()),
-                         new Pair<Double, Double>(state.getX(), state.getY()));
-
-        double time = distance / myTurtle.getSpeed();
-
-        if (distance == 0) {
-            return 100;
-        }
-
-        return time;
-
-    }
-
-    private double distance (Pair point1, Pair point2) {
-        return Math.sqrt(Math.pow((double) point1.getFirst() - (double) point2.getFirst(), 2) +
-                         Math.pow((double) point1.getLast() - (double) point2.getLast(), 2));
-    }
-
-    void undoExecution (IState state) {
-        if (state == null) {
-            reset();
-            return;
-        }
-
-
-        System.out.println("undo execution- graphicswindow");
-
-        updateTurtle(state);
-    }
-
-    void undoState (IState state) {
-        if (state == null) {
-            reset();
-            return;
-        }
-        // System.out.println("Execution Counter is: " + executionCounter);
-
-        
-        System.out.println("undo state- graphicswindow");
-
-        updateTurtle(state);
     }
 
     /**
@@ -270,33 +294,140 @@ public class GraphicsWindow extends StackPane implements IGraphicsWindow, Displa
      * Remove all lines drawn
      */
     void reset () {
-        // Reset turtle's position
-        myTurtle.setTranslateX(0);
-        myTurtle.setTranslateY(0);
-        myTurtle.setRotate(0);
-        
-        while (!nodes.isEmpty()){
-            removeLines();
+        for (Integer key : nodes.keySet()) {
+            Stack<Pair<ITurtleState, Node>> nodeStack = nodes.get(key);
+
+            while (!nodeStack.isEmpty()) {
+                removeNode(nodeStack);
+            }
+
         }
     }
-    
-    
-    public void setSpeed (double speed) {
-        // TODO Auto-generated method stub
-        myTurtle.setSpeed(speed);
-    }
-    
-    void undo(IState state){
-        while (!nodes.isEmpty() && nodes.peek().getFirst()!=state){
-            removeLines();
-        }
-        
-        updateTurtle(state);
-    }
-    
-    private void removeLines(){
-        Pair<IState,Node> pair = nodes.pop();
+
+    /**
+     * Removes the top node from the stack of nodes.
+     * @param nodeStack
+     */
+    private void removeNode (Stack<Pair<ITurtleState, Node>> nodeStack) {
+        Pair<ITurtleState, Node> pair = nodeStack.pop();
+        TurtleView turtle = turtleMap.get(pair.getFirst().getId());
+        turtle.update(pair.getFirst());
         this.getChildren().remove(pair.getLast());
     }
 
+    /**
+     * Adds a node to the top of the stack of nodes
+     * @param state
+     * @param nodeToAdd
+     */
+    private void addNode (ITurtleState state, Node nodeToAdd) {
+        if (!nodes.containsKey(state.getId())) {
+            nodes.put(state.getId(), new Stack<Pair<ITurtleState, Node>>());
+        }
+        Stack<Pair<ITurtleState, Node>> nodeStack = nodes.get(state.getId());
+        nodeStack.push(new Pair<ITurtleState, Node>(state, nodeToAdd));
+        nodes.put(state.getId(), nodeStack);
+        this.getChildren().add(nodeToAdd);
+    }
+
+    /**
+     * Initializes the factory for which to keep track of active turtles.
+     * @param numTurtles
+     */
+    void initialTurtleFactory (int numTurtles) {
+        StringBuilder initializedTurtles = new StringBuilder();
+        initializedTurtles.append("TELL [ ");
+
+        for (int id = 1; id <= numTurtles; id++) {
+            turtleMap.put(id, initializeTurtle(id));
+            initializedTurtles.append(id + " ");
+        }
+        initializedTurtles.append(']');
+        internalEditor.setEditorText(initializedTurtles);
+    }
+
+    /**
+     * Initializes the Turtle class based on a passed id
+     * StackPane.
+     */
+    private TurtleView initializeTurtle (int id) {
+        TurtleView turtle = new TurtleView(id);
+        turtle.setFitWidth(100);
+        turtle.setFitHeight(100);
+        StackPane.setAlignment(turtle, Pos.CENTER);
+        display(turtle);
+        return turtle;
+    }
+
+    /**
+     * Sets speed for all turtles
+     * 
+     * @param speed
+     */
+    void setSpeed (double speed) {
+        for (Integer key : turtleMap.keySet()) {
+            turtleMap.get(key).setSpeed(speed);
+        }
+    }
+
+    /**
+     * Sets pen color for all turtles
+     * 
+     */
+    @Override
+    public void setPenColor (Color color) {
+        for (Integer key : turtleMap.keySet()) {
+            turtleMap.get(key).setPenColor(color);
+        }
+    }
+
+    /**
+     * Gets the frame rate of the turtle state
+     * @param state
+     * @return
+     */
+    double getFrameRate (ITurtleState state) {
+        return turtleMap.get(state.getId()).getFrameRate(state);
+    }
+
+    /**
+     * Returns an unmodifiable map of active turtles
+     * @return
+     */
+    Map<Integer, TurtleView> getTurtles () {
+        return Collections.unmodifiableMap(turtleMap);
+    }
+
+    /**
+     * Gets the turtle corresponding to a particular ID.
+     * @param id
+     * @return
+     */
+    TurtleView getTurtle (int id) {
+        return turtleMap.get(id);
+    }
+    
+    /**
+     * Gets the total number of active turtles.
+     * @return
+     */
+    int getNumTurtles(){
+        return turtleMap.keySet().size();
+    }
+    
+    /**
+     * Gets the current background color index.
+     * @return
+     */
+    int getBackgroundColorIndex(){
+        return this.backgroundColorIndex.getValue();
+    }
+    
+    /**
+     * Sets the current background color index.
+     * @param index
+     */
+    void setBackgroundColorIndex(int index){
+        backgroundColorIndex.setValue(index);
+    }
 }

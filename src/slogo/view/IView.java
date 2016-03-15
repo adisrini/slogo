@@ -1,8 +1,15 @@
 package slogo.view;
 
+import java.util.List;
 import javafx.scene.Scene;
 import slogo.model.IState;
 
+/**
+ * View API
+ * 
+ * @author Aditya Srinivasan, Arjun Desai
+ *
+ */
 public interface IView {
     
     // External APIS
@@ -13,7 +20,7 @@ public interface IView {
      * 
      * @param state: State passed in from the Controller
      */
-    public void updateState(IState state);
+    public void updateState(List<IState> states);
     
     /**
      * 
@@ -30,12 +37,7 @@ public interface IView {
     /**
      * Go to the previous state
      */
-    public void undoState(IState state);
-    
-    /**
-     * Go to last state of previous execution
-     */
-    public void undoExecution(IState state);
+    public void undo (List<IState> states);
     
     // Internal APIS
     

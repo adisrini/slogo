@@ -1,0 +1,11 @@
+to example [ :x ]
+[
+  if greater? :x 10
+  [
+    example difference :x 10
+  ]
+  fd 50
+  right 10
+]
+
+example 100

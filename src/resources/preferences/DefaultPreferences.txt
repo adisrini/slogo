@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+
+<!-- Workspace Preferences XML --> 
+
+<Body>
+<Language value="English"></Language>
+<BackgroundColorIndex value="2"></BackgroundColorIndex>
+<PenColorIndex value ="1"></PenColorIndex>
+<PenWidth value = "3"></PenWidth>
+<Shape value ="1" ></Shape>
+<NumTurtles value="1"></NumTurtles>
+<File value=""></File>
+</Body>

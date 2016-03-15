@@ -1,0 +1,590 @@
+package slogo.view;
+
+import java.util.ResourceBundle;
+import generic.Pair;
+import javafx.animation.Interpolator;
+import javafx.animation.ParallelTransition;
+import javafx.animation.PathTransition;
+import javafx.animation.RotateTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.stage.Stage;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.HLineTo;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
+import slogo.model.ITurtleState;
+
+<<<<<<< HEAD
+//TODO: Add Shape ResourceFile and change image option
+
+=======
+>>>>>>> 366170d604520d39483bc2ec2b28c95e3a571658
+public class TurtleView extends ImageView implements Updatable {
+
+	private static final double DEFAULT_SPEED = 500;
+
+	private static final String TURTLE_STATUS = "ID: ";
+
+	private static final String TOGGLE_VISIBILITY_PROMPT = "Toggle visibility";
+	private static final String CHANGE_TURTLE_PEN_COLOR = "Change this turtle's pen color";
+	private static final String CHANGE_TURTLE_IMAGE = "Change this turtle's image";
+	private static final String STAMP = "Stamp";
+
+	private double mySpeed;
+
+	private Color penColor;
+	private SimpleIntegerProperty penColorIndex;
+
+	private boolean penDown;
+
+	private double newX;
+	private double newY;
+
+	private ParallelTransition plt;
+
+	private static int instanceCounter;
+
+	private double penWidth = 3;
+	private boolean visible;
+
+	private InternalEditor internalEditor;
+	private int id;
+
+	private Tooltip tooltip;
+
+	private ResourceBundle idsToCommands;
+	private ResourceBundle palette;
+
+	public TurtleView(int id) {
+		Image turtleImage = new Image(this.getClass().getResourceAsStream("/resources/images/turtle-default.png"));
+
+		this.setImage(turtleImage);
+		this.mySpeed = DEFAULT_SPEED;
+		this.id = id;
+		penColor = Color.BLACK;
+
+<<<<<<< HEAD
+    private static final String TURTLE_STATUS = "ID: ";
+    private static final String TOGGLE_VISIBILITY_PROMPT = "Toggle visibility";
+    private static final String CHANGE_TURTLE_PEN_COLOR = "Change this turtle's pen color";
+    private static final String CHANGE_TURTLE_IMAGE = "Change this turtle's image";
+    private static final String STAMP = "Stamp";
+    private static final String IMAGE_EXTENSION = "resources/images";
+=======
+		penColorIndex = new SimpleIntegerProperty();
+		final ChangeListener changeListener = new ChangeListener() {
+			@Override
+			public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+				penColor = Color.valueOf(palette.getString(
+						Integer.toString((Integer) (new SimpleIntegerProperty((Integer) newValue)).getValue())));
+>>>>>>> 366170d604520d39483bc2ec2b28c95e3a571658
+
+			}
+		};
+
+		penColorIndex.addListener(changeListener);
+		penColorIndex.setValue(1);
+
+		penDown = true;
+
+		this.setOnMouseClicked(e -> {
+			establishContextMenu().show(this, e.getScreenX(), e.getScreenY());
+		});
+
+		internalEditor = InternalEditor.getInstance();
+
+<<<<<<< HEAD
+    private ResourceBundle idsToCommands;
+    private ResourceBundle palette;
+    private ResourceBundle shape;
+=======
+		tooltip = new Tooltip();
+		visible = true;
+>>>>>>> 366170d604520d39483bc2ec2b28c95e3a571658
+
+		idsToCommands = ResourceBundle.getBundle("resources/general/IdsToCommands");
+		palette = ResourceBundle.getBundle("resources/general/Palette");
+
+		initializeStateVisualization();
+	}
+
+<<<<<<< HEAD
+        penColorIndex = new SimpleIntegerProperty();
+
+        // TODO:FIX
+        final ChangeListener changeListener = new ChangeListener() {
+            @Override
+            public void changed (ObservableValue observable, Object oldValue, Object newValue) {
+                Integer value = (Integer) newValue;
+                if (value == 0) {
+                    penColor = Color.valueOf(palette.getString(Integer.toString((1))));
+                }
+                else {
+                    penColor =
+                            Color.valueOf(palette.getString(Integer.toString((value))));
+                }
+=======
+	void setSpeed(double speed) {
+		this.mySpeed = speed;
+	}
+>>>>>>> 366170d604520d39483bc2ec2b28c95e3a571658
+
+	double getSpeed() {
+		return mySpeed;
+	}
+
+	@Override
+	public void update(Object object) {
+
+		ITurtleState state = (ITurtleState) object;
+
+		TranslateTransition tt = new TranslateTransition(Duration.millis(mySpeed), this);
+
+		double currentX = this.getTranslateX();
+		double currentY = this.getTranslateY();
+
+		newX = state.getX();
+		newY = state.getY();
+
+<<<<<<< HEAD
+        idsToCommands = ResourceBundle.getBundle("resources/general/IdsToCommands");
+        palette = ResourceBundle.getBundle("resources/general/Palette");
+        shape = ResourceBundle.getBundle("resources/general/Shape");
+                
+        initializeStateVisualization();
+    }
+=======
+		tt.setByX(currentX);
+		tt.setByY(currentY);
+		tt.setToX(newX);
+		tt.setToY(newY);
+
+		RotateTransition rt = new RotateTransition(Duration.millis(mySpeed), this);
+>>>>>>> 366170d604520d39483bc2ec2b28c95e3a571658
+
+		double currentHeading = this.getRotate();
+
+		rt.setByAngle(currentHeading);
+		rt.setToAngle(state.getHeading());
+
+		plt = new ParallelTransition(this, tt, rt);
+
+		plt.setOnFinished(e -> {
+			updateTurtleState(state);
+			System.out.println("updated!!!!!!!!!!");
+			tooltip.setText(this.toString());
+		});
+		
+		plt.play();
+
+	}
+
+	private void updateTurtleState(ITurtleState state) {
+		this.setTranslateX(state.getX());
+		this.setTranslateY(state.getY());
+		this.setRotate(state.getHeading());
+
+		this.visible = state.getVisibility();
+		setVisibility(visible);
+
+		if (penColorIndex.getValue() != state.getPenColorIndex()) {
+			penColorIndex.setValue(state.getPenColorIndex());
+		}
+
+		penWidth = state.getPenSize();
+		penDown = state.getPenStatus();
+	}
+
+	private void setVisibility(boolean visible) {
+		if (visible) {
+			this.setOpacity(1);
+		} else {
+			this.setOpacity(0);
+		}
+	}
+
+<<<<<<< HEAD
+        pt.setOnFinished(e -> {
+            updateTurtleState(state);
+            System.out.println("myturtle: " + this.toString());
+            tooltip.setText(this.toString());
+        });
+=======
+	double getFrameRate(ITurtleState state) {
+		double distance = distance(new Pair<Double, Double>(this.getTranslateX(), this.getTranslateY()),
+				new Pair<Double, Double>(state.getX(), state.getY()));
+>>>>>>> 366170d604520d39483bc2ec2b28c95e3a571658
+
+		double time = distance / this.getSpeed();
+
+<<<<<<< HEAD
+    private void updateTurtleState (ITurtleState state) {
+        System.out.println("state: "+state.getX() +" "+state.getY());
+        setTranslateX(state.getX());
+        setTranslateY(state.getY());
+        System.out.println("translate: "+getTranslateX() +" "+getTranslateY());
+        setRotate(state.getHeading());
+
+        this.visible = state.getVisibility();
+        setVisibility(visible);
+        setImageByIndex(state.getShapeIndex());
+        if (penColorIndex.getValue() != state.getPenColorIndex()) {
+            penColorIndex.setValue(state.getPenColorIndex());
+        }
+
+        penWidth = state.getPenSize();
+        penDown = state.getPenStatus();
+    }
+
+    private void setVisibility (boolean visible) {
+        if (visible) {
+            this.setOpacity(1);
+        }
+        else {
+            this.setOpacity(0);
+        }
+    }
+
+    double getFrameRate (ITurtleState state) {
+        double distance =
+                distance(new Pair<Double, Double>(this.getTranslateX(),
+                                                  this.getTranslateY()),
+                         new Pair<Double, Double>(state.getX(), state.getY()));
+
+        double time = distance / this.getSpeed();
+
+        if (distance == 0) {
+            return 100;
+        }
+
+        return time;
+
+    }
+
+    private double distance (Pair<Double, Double> point1, Pair<Double, Double> point2) {
+        return Math.sqrt(Math.pow(point1.getFirst() - point2.getFirst(), 2) +
+                         Math.pow(point1.getLast() - point2.getLast(), 2));
+    }
+
+    private void initializeStateVisualization () {
+        tooltip.setText(this.toString());
+        tooltip.install(this, tooltip);
+    }
+
+    void setImage (String turtleImage) {
+        Image newImage =
+                new Image(this.getClass().getResourceAsStream("/resources/images/" + turtleImage));
+        this.setImage(newImage);
+    }
+    
+    private void setImageByIndex(int shapeKey){
+        if (shapeKey == 0){
+            return;
+        }
+        setImage(IMAGE_EXTENSION+shape.getString(Integer.toString(shapeKey)));
+    }
+
+    void setPenColor (Color color) {
+        penColor = color;
+    }
+
+    Color getPenColor () {
+        return penColor;
+    }
+
+    boolean isPenDown () {
+        return penDown;
+    }
+
+    void reset () {
+        setTranslateX(0);
+        setTranslateY(0);
+        setRotate(0);
+    }
+
+    private double displayValue (double value) {
+        
+        if (Math.abs(value) < Math.pow(10, -10)) {
+            return 0;
+        }
+        return value;
+    }
+
+    public String toString () {
+        String currentState = "ID: " + id + "\nX: " + displayValue(getTranslateX()) + "" +
+                              "\nY: " + displayValue(getTranslateY()) + "\nHeading: " +
+                              displayValue(getRotate()) + "\n";
+
+        System.out.println("pen down: " + penDown);
+        if (penDown) {
+
+            currentState += "Pen Down";
+        }
+        else {
+            currentState += "Pen Up";
+        }
+
+        return currentState;
+    }
+
+    private ContextMenu establishContextMenu () {
+        ContextMenu context = new ContextMenu();
+
+        MenuItem turtleStatus = new MenuItem(TURTLE_STATUS + id);
+
+        SeparatorMenuItem separator = new SeparatorMenuItem();
+
+        MenuItem visibility = new MenuItem(TOGGLE_VISIBILITY_PROMPT);
+        visibility.setOnAction(e -> {
+            String key = null;
+            visible = !visible;
+            if (visible) {
+                key = "ShowTurtle";
+            }
+            else {
+                key = "HideTurtle";
+            }
+            StringBuilder command = new StringBuilder(idsToCommands.getString(key));
+            writeToInternalEditor(command);
+
+        });
+
+        MenuItem color = new MenuItem(CHANGE_TURTLE_PEN_COLOR);
+        color.setOnAction(e -> {
+            StringBuilder command = new StringBuilder(idsToCommands.getString("SetPenColor") + " ");
+            Stage colorStage = new Stage();
+            Group root = new Group();
+            Scene scene = new Scene(root);
+            Palette palette = new Palette();
+            palette.setOnAction(ee -> {
+                command.append(palette.getValue());
+                colorStage.close();
+                writeToInternalEditor(command);
+            });
+            root.getChildren().add(palette);
+            colorStage.setScene(scene);
+            colorStage.show();
+            System.out.println("Changing color");
+        });
+
+        MenuItem image = new MenuItem(CHANGE_TURTLE_IMAGE);
+        image.setOnAction(e -> {
+            // TODO: change image
+        });
+
+        MenuItem stamp = new MenuItem(STAMP);
+        stamp.setOnAction(e -> {
+            writeToInternalEditor(new StringBuilder(idsToCommands.getString(("Stamp"))));
+        });
+
+        context.getItems().addAll(turtleStatus,
+                                  separator,
+                                  visibility,
+                                  color,
+                                  image);
+
+        return context;
+    }
+
+    private void writeToInternalEditor (StringBuilder command) {
+        StringBuilder executeCommand =
+                new StringBuilder(idsToCommands.getString("Tell") + " " + id + " ] ");
+        executeCommand.append(command);
+        internalEditor.setEditorText(executeCommand);
+    }
+
+    int getTurtleId () {
+        return id;
+    }
+
+    String getPenWidth () {
+        return Double.toString(penWidth);
+    }
+
+    String getPenColorIndex () {
+        return Integer.toString(penColorIndex.getValue());
+    }
+
+=======
+		if (distance == 0) {
+			return 100;
+		}
+
+		return time;
+
+	}
+
+	private double distance(Pair<Double, Double> point1, Pair<Double, Double> point2) {
+		return Math.sqrt(
+				Math.pow(point1.getFirst() - point2.getFirst(), 2) + Math.pow(point1.getLast() - point2.getLast(), 2));
+	}
+
+	private void initializeStateVisualization() {
+		tooltip = new Tooltip(this.toString());
+		Tooltip.install(this, tooltip);
+	}
+
+	void setImage(String turtleImage) {
+		Image newImage = new Image(this.getClass().getResourceAsStream("/resources/images/" + turtleImage));
+		this.setImage(newImage);
+	}
+
+	void setPenColor(Color color) {
+		penColor = color;
+	}
+
+	Color getPenColor() {
+		return penColor;
+	}
+
+	boolean isPenDown() {
+		return penDown;
+	}
+
+	void reset() {
+		setTranslateX(0);
+		setTranslateY(0);
+		setRotate(0);
+	}
+
+	private double displayValue(double value) {
+		if (value < Math.pow(10, -10)) {
+			return 0;
+		}
+		return value;
+	}
+
+	public String toString() {
+		String currentState = "ID: " + id + "\nX: " + displayValue(getTranslateX()) + "" + "\nY: "
+				+ displayValue(getTranslateY()) + "\nHeading: " + getRotate() + "\n";
+
+		System.out.println("pen down: " + penDown);
+		if (penDown) {
+
+			currentState += "Pen Down";
+		} else {
+			currentState += "Pen Up";
+		}
+
+		return currentState;
+	}
+
+	private ContextMenu establishContextMenu() {
+		ContextMenu context = new ContextMenu();
+
+		MenuItem turtleStatus = new MenuItem(TURTLE_STATUS + id);
+
+		SeparatorMenuItem separator = new SeparatorMenuItem();
+
+		MenuItem visibility = new MenuItem(TOGGLE_VISIBILITY_PROMPT);
+		visibility.setOnAction(e -> {
+			String key = null;
+			visible = !visible;
+			if (visible) {
+				key = "ShowTurtle";
+			} else {
+				key = "HideTurtle";
+			}
+			StringBuilder command = new StringBuilder(idsToCommands.getString(key));
+			writeToInternalEditor(command);
+
+		});
+
+		MenuItem color = new MenuItem(CHANGE_TURTLE_PEN_COLOR);
+		color.setOnAction(e -> {
+			StringBuilder command = new StringBuilder(idsToCommands.getString("SetPenColor") + " ");
+			Stage colorStage = new Stage();
+			Group root = new Group();
+			Scene scene = new Scene(root);
+			Palette palette = new Palette();
+			palette.setOnAction(ee -> {
+				command.append(palette.getValue());
+				colorStage.close();
+				writeToInternalEditor(command);
+			});
+			root.getChildren().add(palette);
+			colorStage.setScene(scene);
+			colorStage.show();
+			System.out.println("Changing color");
+		});
+
+		MenuItem image = new MenuItem(CHANGE_TURTLE_IMAGE);
+		image.setOnAction(e -> {
+			// TODO: change image
+		});
+
+		MenuItem stamp = new MenuItem(STAMP);
+		stamp.setOnAction(e -> {
+			writeToInternalEditor(new StringBuilder(idsToCommands.getString(("Stamp"))));
+		});
+
+		context.getItems().addAll(turtleStatus, separator, visibility, color, image);
+
+		return context;
+	}
+
+	private void writeToInternalEditor(StringBuilder command) {
+		StringBuilder executeCommand = new StringBuilder(idsToCommands.getString("Tell") + " " + id + " ] ");
+		executeCommand.append(command);
+		internalEditor.setEditorText(executeCommand);
+	}
+
+	int getTurtleId() {
+		return id;
+	}
+
+	String getPenWidth() {
+		return Double.toString(penWidth);
+	}
+
+	String getPenColorIndex() {
+		return Integer.toString(penColorIndex.getValue());
+	}
+
+	public Node layEggs(Node line) {
+		// TODO Auto-generated method stub
+		/*
+		Path path = new Path();
+		System.out.println("THISX " + this.getTranslateX());
+		System.out.println("THISY " + this.getTranslateY());
+		System.out.println("NEWX " + newX);
+		System.out.println("NEWY " + newY);
+		
+		double halfwayX = this.getTranslateX() + (newX - this.getTranslateX()) / 2;
+		double halfwayY = this.getTranslateY() + (newY - this.getTranslateY()) / 2;
+		
+		path.getElements().addAll(new MoveTo(-100, -200), new LineTo(-200, -200));
+		
+		PathTransition pt = new PathTransition(Duration.millis(mySpeed), path, line);
+
+		ScaleTransition st = new ScaleTransition(Duration.millis(mySpeed), line);
+		st.setFromX(0);
+		st.setFromY(0);
+		st.setToX(1);
+		st.setToY(1);
+
+		plt.getChildren().addAll(pt, st);
+
+		plt.play();
+		*/
+
+		return line;
+	}
+>>>>>>> 366170d604520d39483bc2ec2b28c95e3a571658
+}

@@ -10,10 +10,22 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 import slogo.model.Memory;
 
-
+/**
+ * The methods table that shows saved methods.
+ * 
+ * @author Aditya Srinivasan, Arjun Desai
+ *
+ */
 public class Methods extends TableView<Method> {
-    private Memory memory;
+    @SuppressWarnings("unused")
+	private Memory memory;
     private EventHandler<ActionEvent> event;
+    
+    private static final String CALLBACK = "Callback";
+    private static final String NAME_COLUMN = "Name";
+    private static final String ACTION_COLUMN = "Action";
+    private static final String NAME_KEY = "name";
+    private static final String VALUE_KEY = "value";
 
     public Methods(double paneWidth, double paneHeight, EventHandler<ActionEvent> event) {
 
@@ -29,71 +41,64 @@ public class Methods extends TableView<Method> {
         initializeTable();
     }
 
+    /**
+     * Initializes the table.
+     */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private void initializeTable() {
         this.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
-        TableColumn<Method, String> nameColumn = new TableColumn<Method, String>("Name");
-        TableColumn valueColumn = new TableColumn<Method, Button>("Action");
+        TableColumn<Method, String> nameColumn = new TableColumn<Method, String>(NAME_COLUMN);
+        TableColumn valueColumn = new TableColumn<Method, Button>(ACTION_COLUMN);
         
         // set where to read values from
-        nameColumn.setCellValueFactory(new PropertyValueFactory<Method, String>("name"));
-        valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<Method, String>(NAME_KEY));
+        valueColumn.setCellValueFactory(new PropertyValueFactory<>(VALUE_KEY));
         
-        // establish button callback in value column
-        Callback<TableColumn<Method, String>, TableCell<Method, String>> cellFactory =
-                new Callback<TableColumn<Method, String>, TableCell<Method, String>>() {
-					@Override
-                    public TableCell call(TableColumn<Method, String> parameter)
-                    {
-                        final TableCell<Method, String> cell = new TableCell<Method, String>()
-                        {
+        valueColumn.setCellFactory(generateCallback());
 
-                            final Button button = new Button("Callback");
-
-                            @Override
-                            public void updateItem(String item, boolean empty)
-                            {
-                            	super.updateItem(item, empty);
-                                if(empty) {
-                                	// if nothing in the row, don't create a button
-                                	setGraphic(null);
-                                	setText(null);
-                                } else  {
-                                	Method method = getTableView().getItems().get(getIndex());
-                                	button.setId("Callback " + method.getValue());
-                                	button.setOnAction(event);
-                                	setGraphic(button);
-                                	setText(null);
-                                }
-                            }
-                        };
-                        return cell;
-                    }
-                };
-        valueColumn.setCellFactory(cellFactory);
-
-        // add columns to table
         this.getColumns().addAll(nameColumn, valueColumn);
     }
-
-    private void getMethodsFromMap () {
-    	/*
-        Map<String, String> unmodifiableMethodMap = memory.readMethod(methodName)
-
-        for (String variable : unmodifiableVariableMap.keySet()) {
-            addVariableToTable(variable, unmodifiableVariableMap.get(variable));
-        }
-        */
+    
+    /**
+     * Generates the callback to be used by the buttons.
+     * @return
+     */
+    @SuppressWarnings("rawtypes")
+	private Callback generateCallback() {
+    	return new Callback<TableColumn<Method, String>, TableCell<Method, String>>() {
+			@Override
+            public TableCell call(TableColumn<Method, String> parameter) {
+                final TableCell<Method, String> cell = new TableCell<Method, String>() {
+                    final Button button = new Button(CALLBACK);
+                    @Override
+                    public void updateItem(String item, boolean empty) {
+                    	super.updateItem(item, empty);
+                        if(empty) {
+                        	setGraphic(null);
+                        	setText(null);
+                        } else  {
+                        	Method method = getTableView().getItems().get(getIndex());
+                        	button.setId(CALLBACK + " " + method.getValue());
+                        	button.setOnAction(event);
+                        	setGraphic(button);
+                        	setText(null);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
     }
 
+    /**
+     * Adds a method specified to the table.
+     * 
+     * @param name
+     * @param value
+     */
     void addMethodToTable (String name, String value) {
         this.getItems().add(new Method(name, value));
-    }
-
-    public void updateMethods() {
-        this.getItems().clear();
-        getMethodsFromMap();
     }
 
 }

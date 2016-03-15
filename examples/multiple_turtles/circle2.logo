@@ -1,0 +1,19 @@
+# put a bunch of turtles 100 units away from the center
+tell [ 1 2 3 4 5 6 7 8 9 10 ]
+st pu
+rt * / 360 turtles id
+fd 100
+
+
+# make a "spoked wheel" with different colors and shapes
+home
+st pd
+repeat [ 10 ] [
+  ask [ :repcount ] [
+    setps :repcount
+    setpc :repcount
+    setsh :repcount
+    rt * / 360 turtles :repcount
+    fd 100
+  ]
+]

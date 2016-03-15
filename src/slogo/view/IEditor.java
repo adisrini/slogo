@@ -1,5 +1,11 @@
 package slogo.view;
 
+/**
+ * Editor API
+ * 
+ * @author Aditya Srinivasan, Arjun Desai
+ *
+ */
 public interface IEditor {
     
     // External API

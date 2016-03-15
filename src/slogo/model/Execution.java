@@ -1,5 +1,4 @@
 package slogo.model;
-
 import java.util.List;
 
 
@@ -8,27 +7,27 @@ class Execution implements IExecution {
      * Contains a linked list of States that can
      * be navigated through
      */
-    private DoublyLinkedList<IState> myStates;
+    private DoublyLinkedList<List<IState>> myStates;
 
     public Execution () {
-        myStates = new DoublyLinkedList<IState>();
+        myStates = new DoublyLinkedList<List<IState>>();
     }
-
+    
     @Override
-    public IState getCurrState () {
+    public List<IState> getCurrStateList() {
         return myStates.getCurr();
     }
 
-    public IState undoState () {
+    public List<IState> undoStateList () {
         return myStates.undo();
     }
 
-    public IState redoState () {
+    public List<IState> redoStateList () {
         return myStates.redo();
     }
 
     @Override
-    public IState getNextState () {
+    public List<IState> getNextStateList() {
         return myStates.getNext();
     }
 
@@ -38,7 +37,7 @@ class Execution implements IExecution {
      * 
      * @return the state at that Node
      */
-    public IState getPrevState () {
+    public List<IState> getPrevStateList() {
         return myStates.getPrev();
     }
 
@@ -46,19 +45,8 @@ class Execution implements IExecution {
     /**
      * Add state to the end of the list
      */
-    public void addState (IState s) {
-        myStates.add(s);
-    }
-
-    @Override
-    public void createFunctions (String input) {
-
-    }
-
-    @Override
-    public void executeFunctions () {
-        // TODO Auto-generated method stub
-
+    public void addStateList (List<IState> list) {
+        myStates.add(list);
     }
 
     public boolean hasNextState () {
@@ -77,7 +65,7 @@ class Execution implements IExecution {
     /**
      * Returns list of all states
      */
-    public List<IState> getListOfStates () {
+    public List<List<IState>> getListOfStates () {
         return myStates.toList();
     }
 }

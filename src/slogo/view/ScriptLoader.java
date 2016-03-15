@@ -1,11 +1,8 @@
 package slogo.view;
 
-import java.awt.image.RenderedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-
-import javax.imageio.ImageIO;
 
 import generic.Pair;
 import javafx.scene.Scene;

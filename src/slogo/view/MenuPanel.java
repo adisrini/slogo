@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Vector;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -14,6 +13,13 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 
+/**
+ * This is the menu panel view component located at the top of the
+ * view.
+ * 
+ * @author Aditya Srinivasan, Arjun Desai
+ *
+ */
 public class MenuPanel extends MenuBar {
 	
 	private static final String DEFAULT_LOCATION = "/resources/bundles/";
@@ -21,11 +27,14 @@ public class MenuPanel extends MenuBar {
 	
 	Properties menuProperties;
 	
-	private String language;
 	private static final String DEFAULT_LANGUAGE = "English";
 	
 	private EventHandler<ActionEvent> event;
 	
+	/**
+	 * Initializes the menupanel with an event listener.
+	 * @param menuItemEvent
+	 */
 	public MenuPanel(EventHandler<ActionEvent> menuItemEvent) {
 		this.event = menuItemEvent;
 		menuProperties = new OrderedProperties();
@@ -34,7 +43,12 @@ public class MenuPanel extends MenuBar {
 		makeMenus(menuMap(menuItemEvent));
 	}
 	
-	public void setLanguage(String language) {
+	/**
+	 * Sets the language of the menu panel.
+	 * 
+	 * @param language
+	 */
+	void setLanguage(String language) {
 		try {
 			menuProperties.load(this.getClass().getResourceAsStream(DEFAULT_LOCATION + language + EXTENSION));
 		} catch(Exception e) {
@@ -44,6 +58,11 @@ public class MenuPanel extends MenuBar {
 		makeMenus(menuMap(this.event));
 	}
 	
+	/**
+	 * Returns a map of menu names to menuitems.
+	 * @param menuItemEvent
+	 * @return
+	 */
 	private Map<String, List<MenuItem>> menuMap(EventHandler<ActionEvent> menuItemEvent) {
 		Map<String, List<MenuItem>> menus = new LinkedHashMap<String, List<MenuItem>>();
 		for(Enumeration<?> enumer = menuProperties.propertyNames(); enumer.hasMoreElements();) {
@@ -56,6 +75,7 @@ public class MenuPanel extends MenuBar {
 				MenuItem item = new MenuItem(menuProperties.getProperty(key));
 				item.setId(key);
 				item.setOnAction(menuItemEvent);
+				System.out.println(item);
 				items.add(item);
 				menus.put(menuBelonging, items);
 			}
@@ -63,6 +83,10 @@ public class MenuPanel extends MenuBar {
 		return menus;
 	}
 	
+	/**
+	 * Makes the menus given a menu map.
+	 * @param menuMap
+	 */
 	private void makeMenus(Map<String, List<MenuItem>> menuMap) {
 		for(String menuName : menuMap.keySet()) {
 			Menu menu = new Menu(menuName);
@@ -71,6 +95,11 @@ public class MenuPanel extends MenuBar {
 		}
 	}
 	
+	/**
+	 * Finds the menu that a menu item string corresponds to.
+	 * @param str
+	 * @return
+	 */
 	private String findMenu(String str) {    
 		int start = 0;
 	    for(int i=str.length()-1; i>=0; i--) {

@@ -1,0 +1,18 @@
+to tree [ :length :angle :depth :scale ]
+[
+  ifelse equal? :depth 1
+  [
+     fd :length
+     bk :length
+  ]
+  [
+     fd :length
+     lt :angle
+     tree product :length :scale :angle difference :depth 1 :scale
+     rt :angle
+     rt :angle
+     tree product :length :scale :angle difference :depth 1 :scale
+     lt :angle
+     bk :length
+  ]
+]

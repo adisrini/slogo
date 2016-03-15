@@ -1,5 +1,11 @@
 package slogo.view;
 
+/**
+ * Variable API
+ * 
+ * @author Aditya Srinivasan, Arjun Desai
+ *
+ */
 interface IVariable {
     
     // External APIs

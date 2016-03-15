@@ -1,12 +1,11 @@
 package slogo.tester;
 
+import com.sun.prism.paint.Color;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import slogo.view.ColorPickerStage;
-import slogo.view.GraphicsWindow;
 
 public class ColorPickerTester extends Application {
 
@@ -27,7 +26,8 @@ public class ColorPickerTester extends Application {
     }
     
     public static void main (String[] args){
-        launch(args);
+        //launch(args);
+        System.out.println(Color.BLUE.toString());
     }
 
 }

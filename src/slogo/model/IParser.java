@@ -1,6 +1,6 @@
 package slogo.model;
 
-import java.util.regex.Pattern;
+import java.util.Map;
 
 interface IParser {
 	/**
@@ -8,7 +8,7 @@ interface IParser {
      * as read in by the Parser
      * @return Function
      */
-	IFunction parseFunction();
+	IFunction parseFunction(Map<String,Double> myScope);
 	/**
      * Parses a variable name when needed by an argument
      * @return String
@@ -24,7 +24,7 @@ interface IParser {
      * this is either a function value or a constant
      * @return String
      */
-	Double parseExpression();
+	IFunction parseExpression(Map<String,Double> scope);
 	/**
      * Checks to see if the parser
      * has anything left to parse
@@ -37,5 +37,11 @@ interface IParser {
 	public String getPreviousText();
 	public String extractListAsString();
 	boolean reachedListEnd();
-	String readNext(Pattern p);
-}
+	String readNext(String p);
+	public boolean requestedUnlimitedExpressions();
+	public boolean reachedGroupEnd();
+	public String parseGroupStart();
+	
+	public String parseGroupEnd();
+	
+ }

@@ -1,5 +1,11 @@
 package slogo.view;
 
+/**
+ * History API
+ * 
+ * @author Aditya Srinivasan, Arjun Desai
+ *
+ */
 public interface IHistory {
     
    //External APIs

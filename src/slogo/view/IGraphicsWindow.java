@@ -1,8 +1,13 @@
 package slogo.view;
 
 import javafx.scene.paint.Color;
-import slogo.model.IState;
 
+/**
+ * Graphics Window API
+ * 
+ * @author Aditya Srinivasan, Arjun Desai
+ *
+ */
 public interface IGraphicsWindow {
     
     //External API

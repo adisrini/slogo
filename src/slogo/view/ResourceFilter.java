@@ -2,7 +2,6 @@ package slogo.view;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 

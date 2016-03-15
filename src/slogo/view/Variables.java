@@ -1,6 +1,7 @@
 package slogo.view;
 
 import java.util.Map;
+
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
@@ -52,13 +53,13 @@ public class Variables extends TableView<IVariable> implements IVariables {
         IVariable changedVariable = event.getTableView().getItems().get(event.getTablePosition().getRow());
         ((Variable) changedVariable).setValue(event.getNewValue());
         
-        memory.writeVariable(changedVariable.getName(), changedVariable.getValue());
+        memory.getStorageMemory().writeVariable(changedVariable.getName(), changedVariable.getValue());
         
         System.out.println(changedVariable);
     }
 
     private void getVariablesFromMap () {
-        Map<String, Double> unmodifiableVariableMap = memory.getVariableMap();
+        Map<String, Double> unmodifiableVariableMap = memory.getStorageMemory().getVariableMap();
 
         for (String variable : unmodifiableVariableMap.keySet()) {
             addVariableToTable(variable, unmodifiableVariableMap.get(variable));

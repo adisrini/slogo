@@ -3,21 +3,32 @@ package slogo.view;
 import generic.Pair;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.stage.Stage;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 
+/**
+ * Deprecated
+ * Using Palette class instead now 
+ * 
+ * @author Aditya Srinivasan, Arjun Desai
+ *
+ */
 
 public class ColorPickerStage extends CustomDialog {
 
     private static final int WIDTH = 400;
     private static final int HEIGHT = 100;
+    
+    private Color colorChosen;
 
     private static final String TITLE = "Pick your color";
 
     private String context;
+    
+    private Button OK;
 
     private GraphicsWindow graphicsWindow;
 
@@ -25,9 +36,8 @@ public class ColorPickerStage extends CustomDialog {
         super(graphicsWindow);
 
         this.graphicsWindow = graphicsWindow;
-
+        
     }
-
 
     @Override
     public Pair<Scene, String> makeStage () {
@@ -50,22 +60,23 @@ public class ColorPickerStage extends CustomDialog {
     private ColorPicker putColorPicker () {
         ColorPicker colorPicker = new ColorPicker();
         colorPicker.setOnAction(event -> {
-            switch (context) {
-                case "background":
-                    graphicsWindow.setBackgroundColor(colorPicker.getValue());
-                    break;
-                case "pen":
-                    graphicsWindow.setPenColor(colorPicker.getValue());
-            }
+        	colorChosen = colorPicker.getValue();
         });
         return colorPicker;
     }
 
     private HBox putButtons () {
         HBox row = new HBox();
-        Button OK = new Button("OK");
+        OK = new Button("OK");
         OK.setId("OK");
         OK.setOnAction(e -> {
+            switch (context) {
+            case "background":
+                graphicsWindow.setBackgroundColor(colorChosen);
+                break;
+            case "pen":
+                graphicsWindow.setPenColor(colorChosen);
+            }
             this.close();
         });
         Button close = new Button("Cancel");

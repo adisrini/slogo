@@ -1,0 +1,74 @@
+package slogo.tabmanager;
+
+import java.util.List;
+
+import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.VBox;
+
+import java.util.ArrayList;
+
+import slogo.controller.Controller;
+import slogo.view.InternalEditor;
+import slogo.view.View;
+
+public class TabView {
+	
+	private List<View> views;
+	private TabPane tabPane;
+	private InternalEditor internalEditor;
+	
+	public TabView() {
+		this.views = new ArrayList<View>();
+		tabPane = new TabPane();
+		internalEditor = InternalEditor.getInstance();
+		
+	}
+	
+	void add(TabPackage tabPack) {
+		this.views.add(tabPack.getController().getView());
+		updateTabPane(tabPack);
+	}
+	
+	private void updateTabPane(TabPackage tabPack) {
+		View v = tabPack.getController().getView();
+		
+		VBox vbox = new VBox();
+		
+		Tab tab = new Tab("Workspace " + this.views.size());
+		
+		vbox.getChildren().addAll(v.getToolPanel(), v.getGrid());
+
+		tab.setContent(vbox);
+		tabPane.getTabs().add(tab);
+		
+		SingleSelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
+		selectionModel.select(tab);
+		
+		tab.setOnClosed(e -> {
+			this.views.remove(v);
+			if(this.views.size() == 0) {
+				System.exit(0);
+			}		
+		});
+		
+		tab.setOnSelectionChanged(e -> {
+			if(tab.isSelected()) {
+				tabPack.getController().getModel().updateCurrentTab(tabPack.getId());
+				internalEditor.setId(tabPack.getId());				
+			}
+		});
+		
+		v.setCenter(tabPane);
+	}
+
+	View get(int index) {
+		return this.views.get(index);
+	}
+	
+	TabPane getTabPane() {
+		return this.tabPane;
+	}
+	
+}

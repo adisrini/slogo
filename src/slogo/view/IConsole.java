@@ -2,6 +2,12 @@ package slogo.view;
 
 import javafx.scene.text.Text;
 
+/**
+ * Console API
+ * 
+ * @author Aditya Srinivasan, Arjun Desai
+ *
+ */
 public interface IConsole {
     // External APIs
     

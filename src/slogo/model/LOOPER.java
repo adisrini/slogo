@@ -1,36 +1,26 @@
 package slogo.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
-public abstract class LOOPER implements IFunction{
-	protected double myStart;
-	protected String myVariableName;
-	protected double myEnd;
-	protected double myIncrement;
-	protected String myFunctionsString;
-	protected List<IFunction> myFunctions;
+public abstract class Looper extends InnerScopedFunction{
+	private static final int LIMIT = 0;
 
 	@Override
-	public double executeFunction(IMemory m) {
-		System.out.println("My Function String: "+myFunctionsString);
-		
-		
-		myFunctions =  new ArrayList<IFunction>();
-		
+	public double executeFunction(IMemory m, Map<String,Double> scope) {
 		double finalnum = 0;
-		for(double n = myStart; n <= myEnd; n+=myIncrement){
-			m.writeVariable(myVariableName, n);
-			Parser methodParser = new Parser(myFunctionsString,m);
-			methodParser.parseListBegin();
-			while(!methodParser.reachedListEnd()){
-				myFunctions.add(methodParser.parseFunction());
-			}
-			for(IFunction function : myFunctions){
-				function.executeFunction(m);
-			}
-			myFunctions.clear();
+		for(double n = getStart(m); n <= getEnd(m); n+=getIncrement(m)){
+			myScope.put(getVarName(m), n);
+			finalnum = super.executeFunctionList(m, myScope);
 		}
 		return finalnum;
+	}
+	protected abstract double getStart(IMemory m);
+	protected abstract double getEnd(IMemory m);
+	protected abstract String getVarName(IMemory m);
+	protected abstract double getIncrement(IMemory m);
+	
+	@Override
+	protected int argsNeeded() {
+		return LIMIT;
 	}
 }

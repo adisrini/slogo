@@ -3,7 +3,6 @@ package slogo.tester;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import slogo.view.GraphicsWindow;
 import slogo.view.MenuPanel;
 
 public class MenuPanelTester extends Application {

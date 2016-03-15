@@ -1,0 +1,21 @@
+set :x 10
+tell [ 1 2 3 ]
+# this command is only executed once
+set :x * :x :x 
+# all turtles move the same distance
+fd :x
+
+set :x 10
+# temporarily move 3 different turtles
+ask [ 4 5 6 ]
+# team decision: do all turtles move the same distance or different?
+bk set :x + :x 10
+
+set :x 10
+# all turtles definitely each move different distances
+fd set :x * id :x
+
+# team decision: create turtles 7, 8, 9, 10 or just create 10
+tell [ 10 ]
+rt 90
+fd 100

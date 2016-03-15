@@ -1,9 +1,11 @@
+
 package application;
 
 import com.memetix.mst.translate.Translate;
+
 import javafx.application.Application;
 import javafx.stage.Stage;
-import slogo.controller.Controller;
+import slogo.tabmanager.TabController;
 
 
 /**
@@ -20,7 +22,7 @@ public class Main extends Application {
             Translate.setClientId("slogo");
             Translate.setClientSecret("AOybC0uSE9HzZxdFuZh6Sgw7KX+qzd1Ypih/aLRLAVE=");
             
-            new Controller(primaryStage);
+            new TabController(primaryStage);
 
         }
         catch (Exception e) {

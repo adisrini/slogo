@@ -1,0 +1,98 @@
+package slogo.model;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import generic.Pair;
+
+
+public class Model implements IModel {
+    private IMemory memory;
+    private static final Integer STARTER_ID = 1;
+    private final static String NO_EXECUTION_EXISTS = "No Execution Exists";
+    
+    public Model () {
+        memory = Memory.getMemoryInstance();
+    }
+
+    public void initExecution (Pair<String, String> inputs) {
+        IExecution exec = new Execution();
+        
+        if (!memory.hasPrevExecution()) {
+        	IExecution starter = new Execution();
+        	List<IState> initialStates = new ArrayList<IState>();
+        	initialStates.add(new TurtleState(STARTER_ID));
+        	starter.addStateList(initialStates);
+//        	memory.updateStarterDisplay(new DisplayState());
+        	memory.writeExecution(starter);
+//            memory.activateTurtle(STARTER_ID);
+//        	memory.updateStarterState(STARTER_ID, new TurtleState(STARTER_ID));
+        	memory.resetStarterStates();
+        }
+
+        memory.writeExecution(exec);
+        buildAndExecute(inputs.getFirst(), exec);
+    }
+
+	private void buildAndExecute(String input, IExecution exec) {
+        Map<String,Double> myScope = new HashMap<String,Double>(memory.getVariableMap());
+		Parser p = new Parser(input, memory);
+		
+        while (p.hasNext()) {
+            try {p.parseFunction(myScope).executeFunction(memory,myScope);}
+            catch (SlogoException e) {throw e;}
+            
+        }
+	}
+
+    public List<IState> redoState(){
+    	List<IState> list;
+       if (memory.readCurrExecution().hasNextState()) {
+    	   list = memory.readCurrExecution().redoStateList();
+           memory.updateStartersWithStateList(list);
+           return list;
+        }
+       List<List<IState>> listoflists =  memory.redoExecution();
+       if(listoflists==null){return null;}
+       return listoflists.get(listoflists.size()-1);
+    }
+
+    public List<IState> undoState () {
+        if (memory.readCurrExecution().hasPrevState()) {
+        	List<IState> list = memory.readCurrExecution().undoStateList();
+            memory.updateStartersWithStateList(list);
+            return list;
+        }
+        return undoExecution(); 
+    }
+
+    public Iterator<List<IState>> redoExecution () {
+    	List<List<IState>> list =  memory.redoExecution();
+    	if(list == null){return null;}
+    	return list.iterator();
+    }
+
+    public List<IState> undoExecution () {
+    	return memory.undoExecution();
+    }
+
+    public IState resetExecution () {
+    	/*
+        try {
+            IState s = memory.readCurrExecution().getListOfStates().get(0).get(0);
+            memory.setBuilderState(s);
+            return s;
+        }
+        catch (Exception e) {
+    		throw new SlogoException(new Pair<String, String>(NO_EXECUTION_EXISTS,""));
+        }*/
+    	return null;
+    }
+
+    public Iterator<List<IState>> getStateIterator () {
+        return memory.readCurrExecution().getListOfStates().iterator();
+    }
+}

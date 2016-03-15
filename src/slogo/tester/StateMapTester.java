@@ -1,16 +1,17 @@
 package slogo.tester;
 
 import java.util.HashMap;
+
 import slogo.model.State;
 
 public class StateMapTester {
     public static void main (String[] args){
-        State a = new State();
+        State a = new State(0);
         a.setX(100);
         a.setY(100);
         a.setHeading(100);
         
-        State b = new State();
+        State b = new State(0);
         b.setX(100);
         b.setY(100);
         b.setHeading(100);

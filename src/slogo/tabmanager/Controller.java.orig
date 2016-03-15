@@ -1,0 +1,305 @@
+package slogo.controller;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ResourceBundle;
+import org.omg.CORBA.SystemException;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.MenuItem;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+import slogo.model.IState;
+import slogo.model.Model;
+import slogo.model.SlogoException;
+import slogo.view.ColorPickerStage;
+import slogo.view.View;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+
+public class Controller {
+
+    private static final String LANGUAGE_RESOURCE_LOCATION = "resources/languages/";
+    private static final String DEFAULT_LANGUAGE = "English";
+
+    private static final String GENERAL_RESOURCE_LOCATION = "resources/bundles/General";
+
+    private static final String TITLE = "SLogo | A Simple Logo IDE";
+
+    private static final int FRAMES_PER_SECOND = 10;
+    private static final double MILLISECOND_DELAY = 3500 / FRAMES_PER_SECOND;
+
+    private Stage stage;
+
+    private View view;
+    private Model model;
+
+    private String language;
+
+    private Map<String, String> commandMap;
+
+    private ResourceBundle myLanguageResource;
+    private ResourceBundle myGeneralResource;
+
+    private Timeline animation;
+    private Iterator<IState> stateIterator;
+
+    private BooleanProperty undoState = new SimpleBooleanProperty(false);
+    private BooleanProperty undoExecution = new SimpleBooleanProperty(false);
+
+    Map<String, EventHandler<ActionEvent>> eventHandlerMap =
+            new HashMap<String, EventHandler<ActionEvent>>();
+
+    public Controller (Stage stage) {
+        this.stage = stage;
+
+        language = "";
+        myLanguageResource =
+                ResourceBundle.getBundle(LANGUAGE_RESOURCE_LOCATION + DEFAULT_LANGUAGE);
+
+        myGeneralResource = ResourceBundle.getBundle(GENERAL_RESOURCE_LOCATION);
+
+        // TODO: Figure out a way to make this cleaner
+        eventHandlerMap.put(myGeneralResource.getString("Run"), e -> execute());
+        eventHandlerMap.put(myGeneralResource.getString("PrevState"), e -> undoState());
+        eventHandlerMap.put(myGeneralResource.getString("PrevExec"), e -> undoExecution());
+        eventHandlerMap.put(myGeneralResource.getString("NextState"), e -> redoState());
+        eventHandlerMap.put(myGeneralResource.getString("NextExec"), e -> redoExecution());
+        eventHandlerMap.put(myGeneralResource.getString("Reset"), e -> resetExecution());
+
+        view = new View(event -> {
+            onComboBoxAction(event);
+            onContinueAction(event);
+            onMenuItemAction(event);
+            onButtonAction(event);
+            setLanguage();
+            // execute();
+        } , eventHandlerMap);
+
+        commandMap = new HashMap<String, String>();
+        model = new Model();
+
+        setScene();
+        this.stage.show();
+        this.stage.setTitle(TITLE);
+
+        initializeAnimation();
+    }
+
+    private void setScene () {
+        stage.setScene(view.getScene());
+        // stage.setFullScreen(true);
+        // stage.setFullScreenExitHint("");
+    }
+
+    /**
+     * onActionEvent that is passed to the Run buttons in menubar and toolbar
+     * 
+     * When run, the editorText is passed from the view to the controller
+     * The controller passes this text to the model, which processes the data and returns a list of
+     * States
+     * 
+     */
+    private void execute () {
+
+        StringBuilder editorText = view.execute();
+<<<<<<< HEAD
+        
+        callModelExecution(editorText.toString());
+    }
+    
+    private void callModelExecution(String code) {
+    	String parsedCode = parseEditorText(new StringBuilder(code));
+    	try {
+        	model.initExecution(parsedCode);
+        } catch(SlogoException e) {
+        	view.displayError(e.getMessage());
+        	view.alert(e.getMessage());
+=======
+        StringBuilder parsedText = parseEditorText(editorText);
+
+        callModelExecution(parsedText.toString());
+    }
+
+    private void callModelExecution (String code) {
+        try {
+            model.initExecution(code);
+        }
+        catch (SlogoException e) {
+            view.displayError(e.getMessage());
+            view.alert(e.getMessage());
+>>>>>>> arjun
+        }
+        stateIterator = model.getStateIterator();
+
+        animation.play();
+    }
+
+    private void onComboBoxAction (ActionEvent event) {
+        if (event.getSource() instanceof ComboBox) {
+            ComboBox comboBox = (ComboBox) event.getSource();
+            language = comboBox.getValue().toString();
+        }
+    }
+
+    private void onContinueAction (ActionEvent event) {
+        System.out.println("hi");
+    }
+
+    private void onMenuItemAction (ActionEvent event) {
+        if (event.getSource() instanceof MenuItem) {
+            // execute();
+        }
+    }
+<<<<<<< HEAD
+    
+    private void onButtonAction(ActionEvent event) {
+    	Node element = (Node) event.getSource();
+        if(element.getId() != null) {
+        	switch(element.getId()) {
+        		case "Run":
+        			execute();
+        			break;
+        		case "Continue":
+        			view.changeToMainScene();
+        			setScene();
+        			break;
+        	}
+        	if(element.getId().contains("Callback")) {
+        		String code = element.getId().split(" ", 2)[1];
+        		System.out.println("CODE: " + code);
+        		callModelExecution(code);
+        	}
+=======
+
+    private void onButtonAction (ActionEvent event) {
+        Node element = (Node) event.getSource();
+        if (element.getId() != null) {
+            switch (element.getId()) {
+                case "Run":
+                    execute();
+                    break;
+                case "Continue":
+                    view.changeToMainScene();
+                    setScene();
+                    break;
+            }
+            if (element.getId().contains("Callback")) {
+                String code = element.getId().split(" ", 2)[1];
+                callModelExecution(code);
+            }
+>>>>>>> arjun
+        }
+    }
+
+    private String parseEditorText (StringBuilder editorText) {
+        StringBuilder parsedCommands = new StringBuilder();
+        String[] editorTextArray = editorText.toString().split(" ");
+
+        for (String command : editorTextArray) {
+            if (commandMap.containsKey(command)) {
+                System.out.println((command));
+                System.out.println(commandMap.get(command));
+                parsedCommands.append(commandMap.get(command) + " ");
+            }
+            else {
+                parsedCommands.append(command + " ");
+            }
+        }
+
+        return parsedCommands.toString();
+    }
+
+    private void setLanguage () {
+        myLanguageResource = ResourceBundle.getBundle(LANGUAGE_RESOURCE_LOCATION + language);
+        view.setLanguage(language);
+        commandMap.clear();
+
+        for (String key : myLanguageResource.keySet()) {
+            String[] values = myLanguageResource.getString(key).split("\\|");
+
+            for (String value : values) {
+                commandMap.put(value.toLowerCase(), key.toLowerCase());
+            }
+        }
+    }
+
+    private void initializeAnimation () {
+        animation = new Timeline();
+        KeyFrame frame = new KeyFrame(Duration.millis(MILLISECOND_DELAY),
+                                      e -> step());
+        animation.setCycleCount(Timeline.INDEFINITE);
+        animation.getKeyFrames().add(frame);
+    }
+
+    private void step () {
+        if (!stateIterator.hasNext()) {
+            animation.stop();
+            view.onComplete();
+        }
+        else {
+            view.updateState(stateIterator.next());
+        }
+    }
+
+    private void undoState () {
+        IState state = model.undoState();
+
+        System.out.println("New state: " + state);
+
+        if (state == null)
+            return;
+        view.undoState(state);
+    }
+
+    private void undoExecution () {
+        IState state = model.undoExecution();
+
+        System.out.println("New execution: " + state);
+
+        view.undoExecution(state);
+
+    }
+
+    private void redoState () {
+
+        IState state = model.redoState();
+
+        System.out.println("Redo state: " + state);
+
+        view.updateState(state);
+
+    }
+
+    private void redoExecution () {
+
+        IState state = model.redoExecution();
+
+        System.out.println("Redo Execution: " + state);
+
+        view.redoExecution(state);
+    }
+
+    private void resetExecution () {
+
+        IState state = model.resetExecution();
+
+        System.out.println("Reset Execution: " + state);
+
+        view.updateState(state);
+    }
+
+}

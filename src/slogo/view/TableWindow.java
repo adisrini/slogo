@@ -3,8 +3,8 @@ package slogo.view;
 import java.util.Map;
 
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DoubleStringConverter;
@@ -51,7 +51,7 @@ public abstract class TableWindow extends TableView<Object> {
     protected abstract void setVariableValue(CellEditEvent<Object, Double> event);
 
     private void getValuesFromMap () {
-        Map<String, Double> unmodifiableVariableMap = memory.getVariableMap();
+        Map<String, Double> unmodifiableVariableMap = memory.getStorageMemory().getVariableMap();
 
         for (String variable : unmodifiableVariableMap.keySet()) {
             addVariableToTable(variable, unmodifiableVariableMap.get(variable));

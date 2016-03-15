@@ -1,13 +1,19 @@
 package slogo.model;
 
-abstract class PENCHANGE extends STATECREATOR{
-	protected boolean myStatus;
+abstract class PenChange extends TurtleStateCreator{
+	private boolean myStatus;
+	private static final int LIMIT = 0;
+	
 	@Override
-	public double executeFunction(IMemory m) {
-		super.executeFunction(m);
+	protected double setState(TurtleState myState) {
 		myState.setPenStatus(myStatus);
-		m.readCurrExecution().addState(myState);
 		return myStatus ? 1 : 0;
 	}
-
+	protected void setMyStatus(boolean status){
+		myStatus = status;
+	}
+	@Override
+	protected int argsNeeded() {
+		return LIMIT;
+	}
 }
