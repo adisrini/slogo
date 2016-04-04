@@ -1,5 +1,9 @@
 package slogo.model;
-
+/**
+ * The ArithmeticOperator enum.
+ * 
+ * Applies an operator to two doubles.
+ */
 public enum ArithmeticOperator {
 	
 	ADDITION("+"){

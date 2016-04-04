@@ -5,21 +5,31 @@ import java.util.Map;
 import java.util.TreeMap;
 
 
+/**
+ * The Class Memory.
+ * 
+ * Contains both Active memory and Storage memory
+ */
 public class Memory implements IMemory {
+    
+    /** The memory instance. */
     private static Memory memoryInstance = null;
-    // TODO: Change so that the methods are package friendly instead
 
-    //list of all active Tab elements
+    /** List of all active Tab elements. */
     private Map<Integer,ActiveMemory> allActiveMemory;
     private Map<Integer,StorageMemory> allStorageMemory;
     
     
-    //list of pointers to these active Tab elements
+    /** List of pointers to these active Tab elements. */
     private ActiveMemory myActiveMemory;
     private StorageMemory myStorageMemory;
     
+    /** The currently active tab. */
     private int currentlyActiveTab;
     
+    /**
+     * Instantiates a new memory.
+     */
     private Memory () {
     	allActiveMemory = new TreeMap<Integer,ActiveMemory>();
     	allStorageMemory = new TreeMap<Integer,StorageMemory>();
@@ -27,9 +37,8 @@ public class Memory implements IMemory {
 
     /**
      * Singleton Design Pattern Implementation
-     * 
-     * Only one instance of memory can exist in the project
-     * 
+     * Only one instance of memory can exist in the project.
+     *
      * @return private instance of memory
      */
     public static Memory getMemoryInstance () {
@@ -39,6 +48,9 @@ public class Memory implements IMemory {
         return memoryInstance;
     }
     
+    /**
+     * Initializes a tab memory.
+     */
     private void initTabMemory(){
     	
     	//initiate new elements for the new tab
@@ -51,10 +63,13 @@ public class Memory implements IMemory {
         updatePointers();
         
         //set the starter states for these elements
-        myStorageMemory.getExecutionManager().setStarterExecution(); //sets the starter execution to have one new turtle initially at 0,0
-    	myActiveMemory.resetStarterStates(); //sets the active turtle to be 1 and    	
+        myStorageMemory.getExecutionManager().setStarterExecution();
+    	myActiveMemory.resetStarterStates(); 
     }
     
+	/**
+	 * Resets the current Tab to initial settings
+	 */
 	public void resetCurrentTab(){
 		//remove everything so that it can be reinitilazed
 		allActiveMemory.remove(currentlyActiveTab);
@@ -62,9 +77,18 @@ public class Memory implements IMemory {
 		updateCurrentlyActiveTab(currentlyActiveTab);
 	}
 	
+	/**
+	 * Update currently active turtle id.
+	 *
+	 * @param id the id
+	 */
 	public void updateCurrentlyActiveTurtleID(int id){
 		myActiveMemory.updateCurrentlyActiveTurtleID(id);
 	}
+	
+	/**
+	 * updates the currently Active Tab id
+	 */
 	public void updateCurrentlyActiveTab(int id) {
 		this.currentlyActiveTab = id;
 		if(allStorageMemory.get(id)==null){
@@ -74,6 +98,11 @@ public class Memory implements IMemory {
 
 	}
 	
+	/**
+	 * re-do the previous State
+	 * 
+	 * @return List<IState>
+	 */
 	public List<IState> redoState(){
     	List<IState> list = myStorageMemory.getExecutionManager().redoState();
 		if(list!=null){
@@ -85,6 +114,11 @@ public class Memory implements IMemory {
     	return listoflists.get(listoflists.size()-1);
     }
 	
+	/**
+	 * un-do current STate
+	 * 
+	 * @return List<IState>
+	 */
 	public List<IState> undoState(){
     	List<IState> list = myStorageMemory.getExecutionManager().undoState();
 		if(list!=null){
@@ -94,6 +128,11 @@ public class Memory implements IMemory {
     	return undoExecution();
     }
 	
+    /**
+     * un-do current execution
+     * 
+     * @return List<IState>
+     */
     public List<IState> undoExecution () {
     	List<IState> prevStateList = myStorageMemory.getExecutionManager().undoExecution();
     	if(prevStateList==null){myActiveMemory.resetStarterStates();}
@@ -101,6 +140,12 @@ public class Memory implements IMemory {
     	return prevStateList;
     	
     }
+    
+    /**
+     * re-do previous execution
+     * 
+     * @return List<List<IState>>
+     */
     public List<List<IState>> redoExecution() {
     	
     	IExecution nextExecution = myStorageMemory.getExecutionManager().redoExecution();
@@ -109,15 +154,29 @@ public class Memory implements IMemory {
     	
     	return nextListOfStates; 
     }
+	
+	/**
+	 * Update tab specific pointers.
+	 */
 	private void updatePointers(){
 		myActiveMemory = allActiveMemory.get(currentlyActiveTab);
 		myStorageMemory = allStorageMemory.get(currentlyActiveTab);
 	}
 	
+	/**
+	 * get memory storage
+	 * 
+	 * @return StorageMemory
+	 */
 	public StorageMemory getStorageMemory(){
 		return myStorageMemory;
 	}
 	
+	/**
+	 * get active memory
+	 * 
+	 * @return ActiveMemory
+	 */
 	public ActiveMemory getActiveMemory(){
 		return myActiveMemory;
 	}

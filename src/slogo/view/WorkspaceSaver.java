@@ -20,7 +20,7 @@ import slogo.xml.XMLWriter;
 
 
 // TODO: Ask User to override or not
-public class WorkspaceSaver extends CustomDialog{
+public class WorkspaceSaver extends CustomDialog {
     private static final String DEFAULT_XML_PATH = "./src/resources/preferences/PreferencesXML.xml";
     private XMLReader xmlReader;
     private Map<String, String> options;

@@ -13,7 +13,8 @@ public enum ErrorFactory {
 	NoSuchFunctionError("The function % does not exist."),
 	NoSuchVariableError("The variable % does not exist in scope."),
 	VariableSyntaxError("Forgot to place a colon (:) before the variable declaration."),
-	UnrecognizableSyntaxError("Unrecognizable syntax in \'%\'");
+	UnrecognizableSyntaxError("Unrecognizable syntax in \'%\'"),
+	CommandNotContainedInHelpError("The command % is not contained in our Help Manual");
 	
 	private String template;
 	

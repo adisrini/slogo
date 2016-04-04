@@ -4,10 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * The Class DoublyLinkedList.
+ *
+ * @param <E> the element type
+ */
 class DoublyLinkedList<E> {
+    
+    /** Saved Nodes. */
     private Node myHead;
     private Node myStart;
 
+    /**
+     * Gets the Head Node.
+     *
+     * @return curr
+     */
     public E getCurr () {
         if (myHead == null) {
             return null;
@@ -15,6 +27,11 @@ class DoublyLinkedList<E> {
         return myHead.contents;
     }
 
+    /**
+     * Sets Head to next Node.
+     *
+     * @return the contents at that Node
+     */
     public E redo () {
         if (myHead == null){
             return null;
@@ -29,22 +46,11 @@ class DoublyLinkedList<E> {
     }
 
     /**
-     * Sets head to previous Node
-     * 
+     * Sets Head to previous Node.
+     *
      * @return the contents at that Node
      */
     public E undo () {
-        // TODO: THROW EXCEPTION IF THERE IS NO STATE PREVIOUS
-        // System.out.println("my head "+myHead);
-        // System.out.println(myHead.prev);
-        //
-        // if(myHead.prev==null){
-        // Node n = new Node(null);
-        // n.next = myHead;
-        // myHead.prev = n;
-        // return null;}
-        
-        // If the head is null, return null
         if (myHead == null || myHead.prev == null){
             return null;
         }
@@ -54,27 +60,35 @@ class DoublyLinkedList<E> {
         return myHead.contents;
     }
 
+    /**
+     * Gets the Previous Node's contents.
+     *
+     * @return the prev node contents
+     */
     public E getPrev () {
         return myHead.prev.contents;
     }
 
+    /**
+     * Gets the Next Node's contents.
+     *
+     * @return the next node contents
+     */
     public E getNext () {
         return myHead.next.contents;
     }
 
     /**
-     * Add Node to the end of the list
+     * Add Node to the end of the list.
+     *
+     * @param input element
      */
     public void add (E input) {
-        // if no state has been added yet, create a new one
-        // and allow for head and start to point to it
         Node n = new Node(input);
         if (myHead == null) {
             myHead = n;
             myStart = n;
         }
-        // otherwise add the StateNode to the beginning
-        // of the list
         else {
             myHead.next = n;
             n.prev = myHead;
@@ -83,7 +97,9 @@ class DoublyLinkedList<E> {
     }
 
     /**
-     * Returns list of all Node's contents
+     * Returns list of all Node's contents.
+     *
+     * @return the list
      */
     public List<E> toList () {
         Node curr = myStart;
@@ -95,6 +111,12 @@ class DoublyLinkedList<E> {
         return list;
     }
 
+    /**
+     * Checks to see if Head has
+     * Next node.
+     *
+     * @return true, if successful
+     */
     public boolean hasNext () {
         if (myHead == null) {
             return false;
@@ -102,10 +124,21 @@ class DoublyLinkedList<E> {
         return myHead.next != null;
     }
 
+    /**
+     * Checks if is list is empty.
+     *
+     * @return true, if is empty
+     */
     public boolean isEmpty () {
         return myHead == null;
     }
 
+    /**
+     * Checks to see if Head has
+     * a previous Node.
+     *
+     * @return true, if successful
+     */
     public boolean hasPrev () {
         if (myHead == null) {
             return false;
@@ -114,16 +147,35 @@ class DoublyLinkedList<E> {
         return (myHead.prev != null);
     }
 
+    /**
+     * The Inner Class Node.
+     */
     private class Node {
 
+        /** The contents. */
         private E contents;
+        
+        /** The next. */
         private Node next;
+        
+        /** The prev. */
         private Node prev;
 
+        /**
+         * Instantiates a new node.
+         *
+         * @param input the input
+         */
         private Node (E input) {
             contents = input;
         }
 
+        /**
+         * Overrides toString to 
+         * show the contents of the Node
+         * 
+         * @return String 
+         */
         public String toString () {
             return "" + contents;
         }

@@ -17,7 +17,7 @@ public class GraphicsWindowTester extends Application {
     @Override
     public void start(Stage primaryStage) {
             try {
-                    GraphicsWindow gw = new GraphicsWindow(WINDOW_WIDTH, WINDOW_HEIGHT,null);
+                    GraphicsWindow gw = null;
                     Scene scene = new Scene(gw, WINDOW_WIDTH, WINDOW_HEIGHT);
 
                     primaryStage.setTitle(TITLE);

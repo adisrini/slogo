@@ -628,5 +628,5 @@ public class View extends Observable implements Observer, IView {
 	public String getWorkspaceToLoad() {
 		return workspaceToLoad;
 	}
-
+	
 }

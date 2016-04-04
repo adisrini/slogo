@@ -3,7 +3,9 @@ package slogo.model;
 import java.util.Iterator;
 import java.util.List;
 
+
 public class TesterMain {
+	/*
 	public static void main (String[] args){
 		
 		//String tester = "TELL [ 1 2 3 ] ( FORWARD 100 200 300 ( SUM 50 50 50 50 ) ) FORWARD 100 TELL [ 1 2 ] FORWARD 200 TELL [ 3 ] ";
@@ -28,6 +30,7 @@ public class TesterMain {
 //				+ "FORWARD :size "
 //				+ "triangle :size ] "
 //				+ "house";
+	/*
 		System.out.println("First Execution");
 		//String tester = " TELL [ 1 2 3 ] FORWARD PRODUCT 10 10 ( SUM 1 1 1 1 ) ASK [ 1 ] [ FORWARD 20 ] FORWARD 10";
 		String tester1 = "TO square [ :a ] [ forward :a ] square 100";
@@ -94,4 +97,5 @@ public class TesterMain {
 		}
 		
 	}
+	*/
 }

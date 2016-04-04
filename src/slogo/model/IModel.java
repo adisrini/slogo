@@ -14,26 +14,31 @@ interface IModel {
 	public void initExecution(Pair<String, String> inputs);
 	/**
      * Goes back one state
+     * 
      * @return past State
      */
 	public List<IState> redoState();
 	/**
      * Goes forward one state
+     * 
      * @return future state
      */
 	public List<IState> undoState();
 	/**
      * Goes back one execution
+     * 
      * @return past Execution
      */
 	public Iterator<List<IState>> redoExecution();
 	/**
      * Goes forward one execution
+     * 
      * @return future Execution
      */
 	public List<IState> undoExecution();
 	/**
      * Returns Iterator of states
+     * 
      * @return State Iterator
      */
 	public Iterator<List<IState>> getStateIterator();

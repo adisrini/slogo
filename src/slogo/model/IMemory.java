@@ -2,89 +2,60 @@ package slogo.model;
 
 import java.util.List;
 
+/**
+ * The Interface IMemory.
+ */
 interface IMemory {
 	/**
-     * writes an Execution to memory
-     * sets it as the current execution
-     */
-	//void writeExecution(IExecution exec);
+	 * Update currently active tab.
+	 *
+	 * @param currentlyActiveID the currently active id
+	 */
+	void updateCurrentlyActiveTab(int currentlyActiveID);
+	
 	/**
-     * Reads off the current Execution
-     * @return current Execution
-     */
-	//IExecution readCurrExecution();
+	 * Reset current tab.
+	 */
+	void resetCurrentTab();
+	
 	/**
-     * Reads a future Execution
-     * @return next Execution
-     */
+	 * Gets the storage memory.
+	 *
+	 * @return the storage memory
+	 */
+	StorageMemory getStorageMemory();
+	
+	/**
+	 * Gets the active memory.
+	 *
+	 * @return the active memory
+	 */
+	ActiveMemory getActiveMemory();
+	/**
+	 * Reads a future Execution.
+	 *
+	 * @return next Execution
+	 */
 	List<List<IState>> redoExecution();
+	
 	/**
-     * Checks to see if there is a next
-     * Execution
-     * @return boolean
-     */	
-	//boolean hasNextExecution();
-	/**
-     * Goes back one Execution
-     * @return past Execution
-     */	
+	 * Goes back one Execution.
+	 *
+	 * @return past Execution
+	 */	
 	List<IState> undoExecution();
 	
+	/**
+	 * Redo state.
+	 *
+	 * @return the list
+	 */
 	List<IState> redoState();
-
 	
+	/**
+	 * Undo state.
+	 *
+	 * @return the list
+	 */
 	List<IState> undoState();
-
-	/**
-     * Checks to see if has previous
-     * Execution
-     * @return boolean
-     */	
-    //IExecution readPrevExecution ();
-    //IExecution readNextExecution ();
-    
-    //public void updateStartersWithStateList(List<IState> list);
-    
-    //public void resetStarterStates();
-
-	//boolean hasPrevExecution();
-	/**
-     * Writes a variable to the map in Memory
-     */
-	//void writeVariable(String varName, double varValue);
-	/**
-     * Reads a variable from Memory
-     */
-	//Double readVariable(String var);
-	/**
-     * Writes a method to the map in Memory
-     */
-	//void writeMethod(String methodName, String methodContent);
-	/**
-     * Returns the string of method content to be
-     * executed by method
-     * @return String of methodContent
-     */
-	//String readMethod(String methodName);
-	
-	//public TurtleState readStarterState(Integer id);
-
-	//public void updateStarterState(Integer id, TurtleState state);
-	
-	//Map<String, Double> getVariableMap ();
-	//public void activateTurtle(Integer id);
-	//public void deactivateTurtle(Integer id);
-	//public List<Integer> getActiveTurtleIDs();
-	//public void updateActiveTurtles(List<Integer> ids);
-	//public DisplayState getStarterDisplay();
-    //public int readTurtleNumber();
-	//public void updateStarterDisplay(DisplayState myStarterDisplay);
-	//public int getCurrentlyActiveTurtleID();
-	//public void updateCurrentlyActiveTurtleID(int currentlyActiveID);
-	void updateCurrentlyActiveTab(int currentlyActiveID);
-	//public TurtleState getCurrentlyActiveTurtle();
-	void resetCurrentTab();
-	//public void updateVariables(Map<String,Double> m);
-	StorageMemory getStorageMemory();
-	ActiveMemory getActiveMemory();
 }

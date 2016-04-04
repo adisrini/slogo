@@ -43,6 +43,6 @@ public abstract class CustomDialog extends Stage {
 	 * Allows the context to be set
 	 * @param string
 	 */
-	protected abstract void setContext(String string);
+	abstract void setContext(String string);
 
 }
