@@ -8,6 +8,11 @@ The IDE supports development in the Logo programming language, a derivative of t
 ### Responsibilities
 During the project, my responsibilities were primarily based in software designing, front-end development, and system integration.
 
+### Use
+In order to run the program, enter a command line interface and navigate to the directory containing the JAR file (in this case, it is ``/launch/SlogoApplication.jar``. In the CLI, enter the command
+
+>>``java -jar SlogoApplication.jar``
+
 ### Screenshots
 ![Opening Screen](/screenshots/SS1.png "Opening Screen")
 ![Screen 1](/screenshots/SS2.png "Screen 1")
