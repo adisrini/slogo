@@ -7,3 +7,9 @@ The IDE supports development in the Logo programming language, a derivative of t
 
 ### Responsibilities
 During the project, my responsibilities were primarily based in software designing, front-end development, and system integration.
+
+### Screenshots
+![Opening Screen](/screenshots/SS1.png "Opening Screen")
+![Screen 1](/screenshots/SS2.png "Screen 1")
+![Screen 2](/screenshots/SS3.png "Screen 2")
+![Screen 3](/screenshots/SS4.png "Screen 3")
